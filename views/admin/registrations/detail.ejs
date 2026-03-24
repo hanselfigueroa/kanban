@@ -1,0 +1,258 @@
+<%- include('../partials/head', { title: 'Registration #' + registration.id + ' - Kanban.UNO Admin' }) %>
+</head>
+<body>
+<div class="admin-wrapper">
+
+  <%- include('../partials/sidebar') %>
+
+  <div class="admin-main">
+    <%- include('../partials/topbar', { pageTitle: 'Registration Detail' }) %>
+
+    <div class="admin-content">
+
+      <div class="breadcrumb">
+        <a href="/admin/registrations" class="breadcrumb-link">Registrations</a>
+        <i class="fas fa-chevron-right breadcrumb-sep"></i>
+        <span class="breadcrumb-current">#<%= registration.id %></span>
+      </div>
+
+      <div class="detail-layout">
+
+        <!-- Left Column: Registration Info -->
+        <div class="detail-main">
+          <div class="form-card">
+            <div class="form-card-header">
+              <h3 class="form-card-title">
+                <i class="fas fa-user"></i>
+                Registration Info
+              </h3>
+              <span class="detail-id">#<%= registration.id %></span>
+            </div>
+            <div class="form-card-body">
+              <dl class="detail-list">
+
+                <div class="detail-item">
+                  <dt class="detail-label">Full Name</dt>
+                  <dd class="detail-value">
+                    <%= registration.first_name || '' %> <%= registration.last_name || '' %>
+                  </dd>
+                </div>
+
+                <div class="detail-item">
+                  <dt class="detail-label">Email</dt>
+                  <dd class="detail-value">
+                    <a href="mailto:<%= registration.email %>" class="detail-link">
+                      <%= registration.email %>
+                    </a>
+                  </dd>
+                </div>
+
+                <div class="detail-item">
+                  <dt class="detail-label">Phone</dt>
+                  <dd class="detail-value">
+                    <% if (registration.phone) { %>
+                      <a href="tel:<%= registration.phone %>" class="detail-link"><%= registration.phone %></a>
+                    <% } else { %>
+                      <span class="detail-empty">—</span>
+                    <% } %>
+                  </dd>
+                </div>
+
+                <div class="detail-item">
+                  <dt class="detail-label">Company</dt>
+                  <dd class="detail-value"><%= registration.company || '—' %></dd>
+                </div>
+
+                <div class="detail-divider"></div>
+
+                <div class="detail-item">
+                  <dt class="detail-label">Course</dt>
+                  <dd class="detail-value">
+                    <% if (course) { %>
+                      <span class="course-acronym"><%= course.acronym %></span>
+                      <span class="detail-course-name"><%= course.name %></span>
+                    <% } else { %>
+                      <span class="detail-empty"><%= registration.course_id || '—' %></span>
+                    <% } %>
+                  </dd>
+                </div>
+
+                <div class="detail-item">
+                  <dt class="detail-label">Preferred Format</dt>
+                  <dd class="detail-value"><%= registration.preferred_format || '—' %></dd>
+                </div>
+
+                <div class="detail-item">
+                  <dt class="detail-label">Preferred Date</dt>
+                  <dd class="detail-value">
+                    <%= registration.preferred_date ? new Date(registration.preferred_date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : '—' %>
+                  </dd>
+                </div>
+
+                <% if (registration.message) { %>
+                  <div class="detail-divider"></div>
+                  <div class="detail-item detail-item-full">
+                    <dt class="detail-label">Message</dt>
+                    <dd class="detail-value detail-message">
+                      <%= registration.message %>
+                    </dd>
+                  </div>
+                <% } %>
+
+                <div class="detail-divider"></div>
+
+                <div class="detail-item">
+                  <dt class="detail-label">Submitted</dt>
+                  <dd class="detail-value">
+                    <%= registration.created_at ? new Date(registration.created_at).toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }) : '—' %>
+                  </dd>
+                </div>
+
+              </dl>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Management -->
+        <div class="detail-sidebar">
+
+          <!-- Status & Notes -->
+          <div class="form-card">
+            <div class="form-card-header">
+              <h3 class="form-card-title">
+                <i class="fas fa-sliders-h"></i>
+                Manage
+              </h3>
+            </div>
+            <div class="form-card-body">
+
+              <form action="/admin/registrations/<%= registration.id %>" method="POST" id="statusForm">
+                <input type="hidden" name="_method" value="PUT">
+
+                <div class="form-group">
+                  <label for="status" class="form-label">Status</label>
+                  <select id="status" name="status" class="form-select">
+                    <option value="pending" <%= registration.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                    <option value="contacted" <%= registration.status === 'contacted' ? 'selected' : '' %>>Contacted</option>
+                    <option value="confirmed" <%= registration.status === 'confirmed' ? 'selected' : '' %>>Confirmed</option>
+                    <option value="cancelled" <%= registration.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="admin_notes" class="form-label">Admin Notes</label>
+                  <textarea
+                    id="admin_notes"
+                    name="admin_notes"
+                    class="form-textarea"
+                    rows="5"
+                    placeholder="Internal notes about this registration..."
+                  ><%= registration.admin_notes || '' %></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full">
+                  <i class="fas fa-save"></i>
+                  Save Changes
+                </button>
+
+              </form>
+
+              <div class="contact-actions">
+                <h4 class="contact-actions-title">Quick Contact</h4>
+                <a href="mailto:<%= registration.email %>?subject=<%= encodeURIComponent('Re: ' + (course ? course.name : 'Course') + ' Registration') %>" class="btn btn-secondary btn-full">
+                  <i class="fas fa-envelope"></i>
+                  Send Email
+                </a>
+                <button
+                  type="button"
+                  class="btn btn-ghost btn-full"
+                  id="copyEmailBtn"
+                  data-email="<%= registration.email %>"
+                >
+                  <i class="fas fa-copy"></i>
+                  Copy Email Address
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Meta / Timestamps -->
+          <div class="form-card form-card-meta">
+            <div class="form-card-body">
+              <dl class="detail-list detail-list-sm">
+                <div class="detail-item">
+                  <dt class="detail-label">Registration ID</dt>
+                  <dd class="detail-value">#<%= registration.id %></dd>
+                </div>
+                <div class="detail-item">
+                  <dt class="detail-label">Created</dt>
+                  <dd class="detail-value">
+                    <%= registration.created_at ? new Date(registration.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—' %>
+                  </dd>
+                </div>
+                <% if (registration.updated_at) { %>
+                  <div class="detail-item">
+                    <dt class="detail-label">Last Updated</dt>
+                    <dd class="detail-value">
+                      <%= new Date(registration.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+                    </dd>
+                  </div>
+                <% } %>
+              </dl>
+            </div>
+          </div>
+
+          <!-- Danger Zone -->
+          <div class="form-card form-card-danger">
+            <div class="form-card-header">
+              <h3 class="form-card-title form-card-title-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+                Danger Zone
+              </h3>
+            </div>
+            <div class="form-card-body">
+              <p class="danger-zone-text">Permanently delete this registration. This action cannot be undone.</p>
+              <button
+                type="button"
+                class="btn btn-danger btn-full"
+                data-delete-url="/api/admin/registrations/<%= registration.id %>"
+                data-confirm="Permanently delete registration #<%= registration.id %>? This cannot be undone."
+                data-redirect="/admin/registrations"
+              >
+                <i class="fas fa-trash"></i>
+                Delete Registration
+              </button>
+            </div>
+          </div>
+
+        </div><!-- /.detail-sidebar -->
+      </div><!-- /.detail-layout -->
+
+    </div><!-- /.admin-content -->
+  </div><!-- /.admin-main -->
+</div><!-- /.admin-wrapper -->
+
+<script>
+  (function() {
+    var copyBtn = document.getElementById('copyEmailBtn');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', function() {
+        var email = copyBtn.getAttribute('data-email');
+        if (navigator.clipboard && email) {
+          navigator.clipboard.writeText(email).then(function() {
+            var original = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            copyBtn.classList.add('btn-success-flash');
+            setTimeout(function() {
+              copyBtn.innerHTML = original;
+              copyBtn.classList.remove('btn-success-flash');
+            }, 2000);
+          });
+        }
+      });
+    }
+  })();
+</script>
+
+<%- include('../partials/scripts') %>

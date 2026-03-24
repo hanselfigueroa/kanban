@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/mbpromax/Downloads/**)",
+      "Bash(unzip -o stitch_kanban_page.zip -d stitch_kanban_page)"
+    ]
+  }
+}

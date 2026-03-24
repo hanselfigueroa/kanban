@@ -1,0 +1,272 @@
+<%- include('../partials/head', { title: 'Curriculum - ' + course.name + ' - Kanban.UNO Admin' }) %>
+</head>
+<body>
+<div class="admin-wrapper">
+
+  <%- include('../partials/sidebar') %>
+
+  <div class="admin-main">
+    <%- include('../partials/topbar', { pageTitle: 'Curriculum' }) %>
+
+    <div class="admin-content">
+
+      <div class="breadcrumb">
+        <a href="/admin/courses" class="breadcrumb-link">Courses</a>
+        <i class="fas fa-chevron-right breadcrumb-sep"></i>
+        <a href="/admin/courses/<%= course.course_id %>/edit" class="breadcrumb-link"><%= course.name %></a>
+        <i class="fas fa-chevron-right breadcrumb-sep"></i>
+        <span class="breadcrumb-current">Curriculum</span>
+      </div>
+
+      <!-- Course Info Bar -->
+      <div class="course-info-bar">
+        <div class="course-info-bar-left">
+          <span class="course-info-acronym"><%= course.acronym %></span>
+          <span class="course-info-name"><%= course.name %></span>
+        </div>
+        <div class="course-info-bar-right">
+          <span class="course-info-meta">
+            <i class="fas fa-list-ul"></i>
+            <%= modules ? modules.length : 0 %> Module<%= (modules && modules.length === 1) ? '' : 's' %>
+          </span>
+        </div>
+      </div>
+
+      <div class="content-header">
+        <h2 class="content-title">Course Modules</h2>
+        <button type="button" class="btn btn-primary" id="toggleAddModuleForm">
+          <i class="fas fa-plus"></i>
+          Add Module
+        </button>
+      </div>
+
+      <!-- Module List -->
+      <% if (modules && modules.length > 0) { %>
+        <div
+          class="curriculum-list"
+          data-sortable
+          data-reorder-url="/api/admin/curriculum/reorder"
+        >
+          <% modules.forEach(function(module) { %>
+            <div class="curriculum-card" data-module-id="<%= module.id %>">
+              <div class="curriculum-card-left">
+                <div class="drag-handle" title="Drag to reorder">
+                  <i class="fas fa-grip-vertical"></i>
+                </div>
+                <div class="module-number">
+                  <%= module.module_number %>
+                </div>
+              </div>
+              <div class="curriculum-card-body">
+                <div class="module-title"><%= module.module_title %></div>
+                <% if (module.topics) { %>
+                  <div class="module-topics-preview">
+                    <% var topicsArr = Array.isArray(module.topics) ? module.topics : (typeof module.topics === 'string' ? module.topics.split('\n') : []); %>
+                    <% var preview = topicsArr.slice(0, 3); %>
+                    <% preview.forEach(function(topic) { %>
+                      <% if (topic.trim()) { %>
+                        <span class="topic-chip"><%= topic.trim() %></span>
+                      <% } %>
+                    <% }); %>
+                    <% if (topicsArr.length > 3) { %>
+                      <span class="topic-chip topic-chip-more">+<%= topicsArr.length - 3 %> more</span>
+                    <% } %>
+                  </div>
+                <% } %>
+              </div>
+              <div class="curriculum-card-right">
+                <% if (module.duration) { %>
+                  <span class="module-duration">
+                    <i class="fas fa-clock"></i>
+                    <%= module.duration %>
+                  </span>
+                <% } %>
+                <div class="curriculum-actions">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-secondary btn-edit-module"
+                    data-module-id="<%= module.id %>"
+                    data-module-number="<%= module.module_number %>"
+                    data-module-title="<%= module.module_title %>"
+                    data-module-topics="<%= Array.isArray(module.topics) ? module.topics.join('\n') : (module.topics || '') %>"
+                    data-module-duration="<%= module.duration || '' %>"
+                    data-edit-url="/admin/curriculum/<%= module.id %>"
+                  >
+                    <i class="fas fa-pencil-alt"></i>
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-danger"
+                    data-delete-url="/api/admin/curriculum/<%= module.id %>"
+                    data-confirm="Delete this module?"
+                  >
+                    <i class="fas fa-trash"></i>
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      <% } else { %>
+        <div class="empty-state empty-state-sm">
+          <div class="empty-state-icon">
+            <i class="fas fa-list-ul"></i>
+          </div>
+          <h3 class="empty-state-title">No Modules Yet</h3>
+          <p class="empty-state-text">Add your first module to build out the curriculum.</p>
+        </div>
+      <% } %>
+
+      <!-- Add / Edit Module Form (hidden by default) -->
+      <div class="inline-form-section" id="moduleFormSection" style="display:none;">
+        <div class="form-card">
+          <div class="form-card-header">
+            <h3 class="form-card-title" id="moduleFormTitle">
+              <i class="fas fa-plus-circle"></i>
+              Add Module
+            </h3>
+          </div>
+          <div class="form-card-body">
+            <form
+              id="moduleForm"
+              action="/admin/courses/<%= course.id %>/curriculum"
+              method="POST"
+            >
+              <input type="hidden" name="_method" id="moduleFormMethod" value="">
+
+              <div class="form-grid form-grid-2">
+
+                <div class="form-group">
+                  <label for="module_number" class="form-label">Module Number</label>
+                  <input
+                    type="number"
+                    id="module_number"
+                    name="module_number"
+                    class="form-input"
+                    value="<%= modules ? modules.length + 1 : 1 %>"
+                    min="1"
+                    required
+                  >
+                </div>
+
+                <div class="form-group">
+                  <label for="module_duration" class="form-label">Duration</label>
+                  <input
+                    type="text"
+                    id="module_duration"
+                    name="duration"
+                    class="form-input"
+                    placeholder="e.g. 90 min"
+                  >
+                </div>
+
+                <div class="form-group form-group-full">
+                  <label for="module_title" class="form-label">Module Title <span class="required">*</span></label>
+                  <input
+                    type="text"
+                    id="module_title"
+                    name="module_title"
+                    class="form-input"
+                    placeholder="Module title..."
+                    required
+                  >
+                </div>
+
+                <div class="form-group form-group-full">
+                  <label for="module_topics" class="form-label">Topics</label>
+                  <textarea
+                    id="module_topics"
+                    name="topics"
+                    class="form-textarea"
+                    rows="5"
+                    placeholder="Enter one topic per line..."
+                  ></textarea>
+                  <span class="form-hint">One topic per line. These will be stored as a list.</span>
+                </div>
+
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary" id="moduleFormSubmitBtn">
+                  <i class="fas fa-save"></i>
+                  <span id="moduleFormSubmitLabel">Add Module</span>
+                </button>
+                <button type="button" class="btn btn-secondary" id="cancelModuleForm">
+                  <i class="fas fa-times"></i>
+                  Cancel
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.admin-content -->
+  </div><!-- /.admin-main -->
+</div><!-- /.admin-wrapper -->
+
+<script>
+  (function() {
+    var formSection = document.getElementById('moduleFormSection');
+    var moduleForm = document.getElementById('moduleForm');
+    var moduleFormTitle = document.getElementById('moduleFormTitle');
+    var moduleFormMethod = document.getElementById('moduleFormMethod');
+    var moduleFormSubmitLabel = document.getElementById('moduleFormSubmitLabel');
+    var toggleBtn = document.getElementById('toggleAddModuleForm');
+    var cancelBtn = document.getElementById('cancelModuleForm');
+    var baseAction = '/admin/courses/<%= course.id %>/curriculum';
+
+    function showForm() {
+      formSection.style.display = '';
+      formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function hideForm() {
+      formSection.style.display = 'none';
+      resetForm();
+    }
+
+    function resetForm() {
+      moduleForm.reset();
+      moduleForm.action = baseAction;
+      moduleFormMethod.value = '';
+      moduleFormTitle.innerHTML = '<i class="fas fa-plus-circle"></i> Add Module';
+      moduleFormSubmitLabel.textContent = 'Add Module';
+    }
+
+    toggleBtn.addEventListener('click', function() {
+      if (formSection.style.display === 'none') {
+        resetForm();
+        showForm();
+      } else {
+        hideForm();
+      }
+    });
+
+    cancelBtn.addEventListener('click', hideForm);
+
+    document.querySelectorAll('.btn-edit-module').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var id = btn.getAttribute('data-module-id');
+        var editUrl = btn.getAttribute('data-edit-url');
+
+        document.getElementById('module_number').value = btn.getAttribute('data-module-number');
+        document.getElementById('module_title').value = btn.getAttribute('data-module-title');
+        document.getElementById('module_topics').value = btn.getAttribute('data-module-topics');
+        document.getElementById('module_duration').value = btn.getAttribute('data-module-duration');
+
+        moduleForm.action = editUrl;
+        moduleFormMethod.value = 'PUT';
+        moduleFormTitle.innerHTML = '<i class="fas fa-pencil-alt"></i> Edit Module';
+        moduleFormSubmitLabel.textContent = 'Save Changes';
+
+        showForm();
+      });
+    });
+  })();
+</script>
+
+<%- include('../partials/scripts') %>

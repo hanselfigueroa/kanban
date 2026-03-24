@@ -1,0 +1,70 @@
+<%- include('partials/head', { title: 'Admin Login - Kanban.UNO' }) %>
+</head>
+<body class="admin-body">
+
+  <div class="admin-login-page">
+    <div class="admin-login-card">
+
+      <div class="admin-login-logo">
+        <div class="admin-login-logo-mark">K</div>
+        <div class="admin-login-site-name">KANBAN.<span class="logo-uno">UNO</span></div>
+        <div class="admin-login-sub">Administration Panel</div>
+      </div>
+
+      <p class="admin-login-title">Admin Access</p>
+
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="admin-login-alert">
+          <i class="fas fa-exclamation-circle"></i>
+          <%= error %>
+        </div>
+      <% } %>
+
+      <form action="/admin/login" method="POST">
+        <div class="admin-form-group">
+          <label class="admin-form-label">USERNAME</label>
+          <div class="admin-input-icon-wrap">
+            <i class="fas fa-user admin-input-icon-left"></i>
+            <input
+              type="text"
+              name="username"
+              class="admin-input admin-input-with-icon"
+              placeholder="Enter username"
+              autocomplete="username"
+              required
+            >
+          </div>
+        </div>
+
+        <div class="admin-form-group">
+          <label class="admin-form-label">PASSWORD</label>
+          <div class="admin-input-icon-wrap">
+            <i class="fas fa-lock admin-input-icon-left"></i>
+            <input
+              type="password"
+              name="password"
+              class="admin-input admin-input-with-icon"
+              placeholder="Enter password"
+              autocomplete="current-password"
+              required
+            >
+          </div>
+        </div>
+
+        <button type="submit" class="btn-admin btn-admin-primary btn-admin-lg" style="width:100%; margin-top: 8px;">
+          <i class="fas fa-sign-in-alt"></i>
+          Sign In
+        </button>
+      </form>
+
+      <div style="text-align: center; margin-top: 24px;">
+        <a href="/" style="color: var(--admin-text-muted); font-size: 13px;">
+          <i class="fas fa-arrow-left" style="margin-right: 6px;"></i>
+          Back to Main Site
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+<%- include('partials/scripts') %>

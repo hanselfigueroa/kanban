@@ -1,0 +1,196 @@
+<%- include('partials/head', { title: title || 'Dashboard - Kanban.UNO Admin' }) %>
+</head>
+<body class="admin-body">
+
+  <div class="admin-wrapper">
+
+    <%- include('partials/sidebar') %>
+
+    <div class="admin-main" id="adminMain">
+
+      <%- include('partials/topbar') %>
+
+      <div class="admin-content">
+
+        <!-- Metric Cards -->
+        <div class="metrics-grid">
+
+          <div class="metric-card metric-card--primary">
+            <div class="metric-card__icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <div class="metric-card__body">
+              <span class="metric-card__value"><%= stats.totalRegistrations %></span>
+              <span class="metric-card__label">Total Registrations</span>
+            </div>
+          </div>
+
+          <div class="metric-card metric-card--warning">
+            <div class="metric-card__icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="metric-card__body">
+              <span class="metric-card__value"><%= stats.pendingRegistrations %></span>
+              <span class="metric-card__label">Pending</span>
+            </div>
+          </div>
+
+          <div class="metric-card metric-card--info">
+            <div class="metric-card__icon">
+              <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="metric-card__body">
+              <span class="metric-card__value"><%= stats.upcomingDates %></span>
+              <span class="metric-card__label">Upcoming Dates</span>
+            </div>
+          </div>
+
+          <div class="metric-card metric-card--success">
+            <div class="metric-card__icon">
+              <i class="fas fa-book-open"></i>
+            </div>
+            <div class="metric-card__body">
+              <span class="metric-card__value"><%= stats.activeCourses %></span>
+              <span class="metric-card__label">Active Courses</span>
+            </div>
+          </div>
+
+        </div>
+        <!-- End Metric Cards -->
+
+        <!-- Two-column layout -->
+        <div class="dashboard-columns">
+
+          <!-- Recent Registrations (wider) -->
+          <div class="dashboard-col dashboard-col--wide">
+            <div class="panel">
+              <div class="panel__header">
+                <h2 class="panel__title">Recent Registrations</h2>
+              </div>
+              <div class="panel__body panel__body--table">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Course</th>
+                      <th>Date</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% if (recentRegistrations && recentRegistrations.length > 0) { %>
+                      <% recentRegistrations.forEach(r => { %>
+                        <tr>
+                          <td class="td-name">
+                            <%= r.firstName %> <%= r.lastName %>
+                          </td>
+                          <td class="td-email">
+                            <a href="mailto:<%= r.email %>"><%= r.email %></a>
+                          </td>
+                          <td class="td-course">
+                            <%= r.courseName || (r.courseDate && r.courseDate.course && r.courseDate.course.title) || '-' %>
+                          </td>
+                          <td class="td-date">
+                            <% if (r.courseDate && r.courseDate.startDate) { %>
+                              <%= new Date(r.courseDate.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) %>
+                            <% } else { %>
+                              -
+                            <% } %>
+                          </td>
+                          <td class="td-status">
+                            <span class="status-badge status-badge--<%= r.status ? r.status.toLowerCase() : 'pending' %>">
+                              <%= r.status || 'Pending' %>
+                            </span>
+                          </td>
+                          <td class="td-actions">
+                            <a href="/admin/registrations/<%= r._id %>" class="btn-action btn-action--view">
+                              <i class="fas fa-eye"></i>
+                              View
+                            </a>
+                          </td>
+                        </tr>
+                      <% }) %>
+                    <% } else { %>
+                      <tr>
+                        <td colspan="6" class="td-empty">No registrations found.</td>
+                      </tr>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+              <div class="panel__footer">
+                <a href="/admin/registrations" class="panel-link">
+                  View All Registrations
+                  <i class="fas fa-arrow-right"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          <!-- End Recent Registrations -->
+
+          <!-- Upcoming Dates (narrower) -->
+          <div class="dashboard-col dashboard-col--narrow">
+            <div class="panel">
+              <div class="panel__header">
+                <h2 class="panel__title">Upcoming Dates</h2>
+              </div>
+              <div class="panel__body">
+                <% if (upcomingDates && upcomingDates.length > 0) { %>
+                  <ul class="dates-list">
+                    <% upcomingDates.slice(0, 5).forEach(d => { %>
+                      <li class="dates-list__item">
+                        <div class="dates-list__info">
+                          <span class="dates-list__course">
+                            <%= d.course ? d.course.title : 'Untitled Course' %>
+                          </span>
+                          <span class="dates-list__date">
+                            <i class="fas fa-calendar-alt"></i>
+                            <%= new Date(d.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) %>
+                          </span>
+                          <div class="dates-list__meta">
+                            <span class="format-badge format-badge--<%= d.format ? d.format.toLowerCase().replace(/\s+/g, '-') : 'online' %>">
+                              <%= d.format || 'Online' %>
+                            </span>
+                            <span class="dates-list__spots">
+                              <i class="fas fa-user-friends"></i>
+                              <% const booked = d.bookedSpots || 0; const total = d.maxParticipants || 0; %>
+                              <%= booked %>/<%= total %> spots
+                            </span>
+                          </div>
+                        </div>
+                        <a href="/admin/dates/<%= d._id %>/edit" class="btn-action btn-action--edit">
+                          <i class="fas fa-pencil-alt"></i>
+                          Edit
+                        </a>
+                      </li>
+                    <% }) %>
+                  </ul>
+                <% } else { %>
+                  <p class="empty-state">No upcoming dates scheduled.</p>
+                <% } %>
+              </div>
+              <div class="panel__footer">
+                <a href="/admin/dates" class="panel-link">
+                  Manage All Dates
+                  <i class="fas fa-arrow-right"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          <!-- End Upcoming Dates -->
+
+        </div>
+        <!-- End Two-column layout -->
+
+      </div>
+      <!-- End admin-content -->
+
+    </div>
+    <!-- End admin-main -->
+
+  </div>
+  <!-- End admin-wrapper -->
+
+<%- include('partials/scripts') %>

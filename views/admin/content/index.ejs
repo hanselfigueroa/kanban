@@ -1,0 +1,360 @@
+<%- include('../partials/head', { title: 'Page Content - Kanban.UNO Admin' }) %>
+</head>
+<body>
+<div class="admin-wrapper">
+
+  <%- include('../partials/sidebar') %>
+
+  <div class="admin-main">
+    <%- include('../partials/topbar', { pageTitle: 'Page Content' }) %>
+
+    <div class="admin-content">
+
+      <div class="content-header">
+        <h2 class="content-title">Page Content</h2>
+        <p class="content-subtitle">Manage the text content displayed across your site pages.</p>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div class="tab-nav">
+        <button class="tab-btn active" data-tab="home">
+          <i class="fas fa-home"></i>
+          Home Page
+        </button>
+        <button class="tab-btn" data-tab="about">
+          <i class="fas fa-info-circle"></i>
+          About Page
+        </button>
+      </div>
+
+      <!-- Home Page Tab -->
+      <div class="tab-panel active" id="tab-home">
+
+        <!-- Hero Badge -->
+        <div class="content-card">
+          <div class="content-card-header">
+            <div>
+              <h3 class="content-card-title">Hero Badge Text</h3>
+              <p class="content-card-desc">The small accreditation badge displayed above the hero headline.</p>
+            </div>
+          </div>
+          <form class="content-section-form" data-key="hero_badge">
+            <div class="form-group">
+              <input
+                type="text"
+                class="form-control content-input"
+                name="value"
+                value="<%= contentSections.hero_badge || '' %>"
+                placeholder="e.g. Kanban University Accredited"
+                maxlength="80"
+              >
+              <div class="char-counter"><span class="char-count">0</span> / 80</div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary btn-sm">
+                <i class="fas fa-save"></i>
+                Save Section
+              </button>
+              <a href="#" class="btn-reset-link" data-key="hero_badge" data-default="Kanban University Accredited">Reset to Default</a>
+            </div>
+          </form>
+        </div>
+
+        <!-- Hero Headline -->
+        <div class="content-card">
+          <div class="content-card-header">
+            <div>
+              <h3 class="content-card-title">Hero Headline</h3>
+              <p class="content-card-desc">The main large headline shown in the hero section at the top of the home page.</p>
+            </div>
+          </div>
+          <form class="content-section-form" data-key="hero_headline">
+            <div class="form-group">
+              <input
+                type="text"
+                class="form-control content-input"
+                name="value"
+                value="<%= contentSections.hero_headline || '' %>"
+                placeholder="e.g. Master Kanban. Transform Your Team."
+                maxlength="120"
+              >
+              <div class="char-counter"><span class="char-count">0</span> / 120</div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary btn-sm">
+                <i class="fas fa-save"></i>
+                Save Section
+              </button>
+              <a href="#" class="btn-reset-link" data-key="hero_headline" data-default="Master Kanban. Transform Your Team.">Reset to Default</a>
+            </div>
+          </form>
+        </div>
+
+        <!-- Hero Sub-headline -->
+        <div class="content-card">
+          <div class="content-card-header">
+            <div>
+              <h3 class="content-card-title">Hero Sub-headline</h3>
+              <p class="content-card-desc">Supporting text beneath the hero headline that elaborates on the value proposition.</p>
+            </div>
+          </div>
+          <form class="content-section-form" data-key="hero_subheadline">
+            <div class="form-group">
+              <textarea
+                class="form-control content-input"
+                name="value"
+                rows="3"
+                maxlength="300"
+                placeholder="e.g. Official Kanban University training for professionals..."
+              ><%= contentSections.hero_subheadline || '' %></textarea>
+              <div class="char-counter"><span class="char-count">0</span> / 300</div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary btn-sm">
+                <i class="fas fa-save"></i>
+                Save Section
+              </button>
+              <a href="#" class="btn-reset-link" data-key="hero_subheadline" data-default="">Reset to Default</a>
+            </div>
+          </form>
+        </div>
+
+        <!-- CTA Banner Headline -->
+        <div class="content-card">
+          <div class="content-card-header">
+            <div>
+              <h3 class="content-card-title">CTA Banner Headline</h3>
+              <p class="content-card-desc">The headline inside the call-to-action banner section urging visitors to register.</p>
+            </div>
+          </div>
+          <form class="content-section-form" data-key="cta_headline">
+            <div class="form-group">
+              <input
+                type="text"
+                class="form-control content-input"
+                name="value"
+                value="<%= contentSections.cta_headline || '' %>"
+                placeholder="e.g. Ready to Get Certified?"
+                maxlength="120"
+              >
+              <div class="char-counter"><span class="char-count">0</span> / 120</div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary btn-sm">
+                <i class="fas fa-save"></i>
+                Save Section
+              </button>
+              <a href="#" class="btn-reset-link" data-key="cta_headline" data-default="Ready to Get Certified?">Reset to Default</a>
+            </div>
+          </form>
+        </div>
+
+        <!-- CTA Description -->
+        <div class="content-card">
+          <div class="content-card-header">
+            <div>
+              <h3 class="content-card-title">CTA Description</h3>
+              <p class="content-card-desc">Descriptive paragraph inside the CTA banner shown below the CTA headline.</p>
+            </div>
+          </div>
+          <form class="content-section-form" data-key="cta_description">
+            <div class="form-group">
+              <textarea
+                class="form-control content-input"
+                name="value"
+                rows="3"
+                maxlength="400"
+                placeholder="e.g. Join hundreds of professionals who have transformed their teams..."
+              ><%= contentSections.cta_description || '' %></textarea>
+              <div class="char-counter"><span class="char-count">0</span> / 400</div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary btn-sm">
+                <i class="fas fa-save"></i>
+                Save Section
+              </button>
+              <a href="#" class="btn-reset-link" data-key="cta_description" data-default="">Reset to Default</a>
+            </div>
+          </form>
+        </div>
+
+      </div><!-- /#tab-home -->
+
+      <!-- About Page Tab -->
+      <div class="tab-panel" id="tab-about">
+
+        <!-- About Page Headline -->
+        <div class="content-card">
+          <div class="content-card-header">
+            <div>
+              <h3 class="content-card-title">About Page Headline</h3>
+              <p class="content-card-desc">The primary headline displayed at the top of the About page.</p>
+            </div>
+          </div>
+          <form class="content-section-form" data-key="about_headline">
+            <div class="form-group">
+              <input
+                type="text"
+                class="form-control content-input"
+                name="value"
+                value="<%= contentSections.about_headline || '' %>"
+                placeholder="e.g. About Kanban.UNO"
+                maxlength="120"
+              >
+              <div class="char-counter"><span class="char-count">0</span> / 120</div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary btn-sm">
+                <i class="fas fa-save"></i>
+                Save Section
+              </button>
+              <a href="#" class="btn-reset-link" data-key="about_headline" data-default="About Kanban.UNO">Reset to Default</a>
+            </div>
+          </form>
+        </div>
+
+        <!-- Mission Text -->
+        <div class="content-card">
+          <div class="content-card-header">
+            <div>
+              <h3 class="content-card-title">Mission Text</h3>
+              <p class="content-card-desc">The mission statement paragraph displayed on the About page describing the organisation's purpose.</p>
+            </div>
+          </div>
+          <form class="content-section-form" data-key="about_mission">
+            <div class="form-group">
+              <textarea
+                class="form-control content-input"
+                name="value"
+                rows="5"
+                maxlength="800"
+                placeholder="e.g. Our mission is to empower teams with world-class Kanban training..."
+              ><%= contentSections.about_mission || '' %></textarea>
+              <div class="char-counter"><span class="char-count">0</span> / 800</div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary btn-sm">
+                <i class="fas fa-save"></i>
+                Save Section
+              </button>
+              <a href="#" class="btn-reset-link" data-key="about_mission" data-default="">Reset to Default</a>
+            </div>
+          </form>
+        </div>
+
+      </div><!-- /#tab-about -->
+
+    </div><!-- /.admin-content -->
+  </div><!-- /.admin-main -->
+</div><!-- /.admin-wrapper -->
+
+<%- include('../partials/scripts') %>
+
+<script>
+(function () {
+
+  // ── Tab switching ──────────────────────────────────────────────────────────
+  document.querySelectorAll('.tab-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
+      document.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ── Character counters ─────────────────────────────────────────────────────
+  function initCounter(input) {
+    var maxLen = parseInt(input.getAttribute('maxlength'), 10);
+    var display = input.closest('.form-group').querySelector('.char-count');
+    if (!display) return;
+    function update() { display.textContent = input.value.length; }
+    update();
+    input.addEventListener('input', update);
+  }
+  document.querySelectorAll('.content-input').forEach(initCounter);
+
+  // ── AJAX save ─────────────────────────────────────────────────────────────
+  document.querySelectorAll('.content-section-form').forEach(function (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var key = form.dataset.key;
+      var input = form.querySelector('[name="value"]');
+      var btn = form.querySelector('[type="submit"]');
+      var originalHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
+
+      fetch('/api/admin/content/' + key, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ value: input.value })
+      })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (data.success) {
+            showToast('Section saved successfully.', 'success');
+          } else {
+            showToast(data.message || 'Save failed.', 'error');
+          }
+        })
+        .catch(function () {
+          showToast('Network error. Please try again.', 'error');
+        })
+        .finally(function () {
+          btn.disabled = false;
+          btn.innerHTML = originalHtml;
+        });
+    });
+  });
+
+  // ── Reset to default ──────────────────────────────────────────────────────
+  document.querySelectorAll('.btn-reset-link').forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      var key = link.dataset.key;
+      var defaultVal = link.dataset.default || '';
+      if (!confirm('Reset "' + key + '" to its default value? This cannot be undone.')) return;
+
+      fetch('/api/admin/content/' + key, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ value: defaultVal })
+      })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (data.success) {
+            var form = link.closest('.content-section-form');
+            var input = form.querySelector('[name="value"]');
+            input.value = defaultVal;
+            input.dispatchEvent(new Event('input'));
+            showToast('Section reset to default.', 'success');
+          } else {
+            showToast(data.message || 'Reset failed.', 'error');
+          }
+        })
+        .catch(function () {
+          showToast('Network error. Please try again.', 'error');
+        });
+    });
+  });
+
+  // ── Toast helper ──────────────────────────────────────────────────────────
+  function showToast(message, type) {
+    var container = document.getElementById('toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'toast-container';
+      container.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:10px;';
+      document.body.appendChild(container);
+    }
+    var toast = document.createElement('div');
+    toast.className = 'admin-toast admin-toast-' + type;
+    toast.style.cssText = 'background:' + (type === 'success' ? '#10b981' : '#ef4444') + ';color:#fff;padding:12px 20px;border-radius:8px;font-size:14px;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,.15);display:flex;align-items:center;gap:8px;min-width:240px;';
+    toast.innerHTML = '<i class="fas ' + (type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle') + '"></i>' + message;
+    container.appendChild(toast);
+    setTimeout(function () { toast.remove(); }, 3500);
+  }
+
+})();
+</script>

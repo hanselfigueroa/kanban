@@ -1,0 +1,138 @@
+<%- include('partials/header') %>
+<%- include('partials/nav') %>
+
+<!-- Hero Section -->
+<section class="hero" id="hero">
+  <div class="hero-bg"></div>
+  <div class="container hero-content">
+    <span class="hero-badge">Kanban University Accredited</span>
+    <h1 class="hero-title"><%- (content && content.hero_headline) ? content.hero_headline.replace(/\*\*(.*?)\*\*/g, '<span class="text-gradient">$1</span>') : 'Master the Art of <span class="text-gradient">Continuous Flow</span>' %></h1>
+    <p class="hero-subtitle"><%= (content && content.hero_subheadline) || 'Transform your chaotic workload into an architectural stream of productivity. Join professionals mastering the Kanban methodology at the highest level.' %></p>
+    <div class="hero-cta">
+      <a href="#courses" class="btn btn-primary btn-lg">Start Learning Now <i class="fas fa-arrow-right"></i></a>
+      <a href="/courses" class="btn btn-outline btn-lg">View Curriculum</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat">
+        <span class="stat-number">4</span>
+        <span class="stat-label">Certification Levels</span>
+      </div>
+      <div class="stat">
+        <span class="stat-number">500+</span>
+        <span class="stat-label">Graduates</span>
+      </div>
+      <div class="stat">
+        <span class="stat-number">98%</span>
+        <span class="stat-label">Satisfaction Rate</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Courses Section -->
+<section class="section section-dark" id="courses">
+  <div class="container">
+    <div class="section-header fade-in">
+      <span class="section-badge">Signature Programs</span>
+      <h2 class="section-title">Choose Your <span class="text-gradient">Learning Path</span></h2>
+      <p class="section-subtitle">From foundational team practices to enterprise-level business agility</p>
+    </div>
+    <div class="courses-grid">
+      <% Object.values(courses).forEach((course, index) => { %>
+      <div class="course-card fade-in" style="animation-delay: <%= index * 0.1 %>s">
+        <div class="course-card-header" style="border-top: 2px solid <%= course.color %>">
+          <div class="course-icon" style="color: <%= course.color %>">
+            <i class="fas <%= course.icon %>"></i>
+          </div>
+          <span class="course-level"><%= course.level %></span>
+        </div>
+        <div class="course-card-body">
+          <h3 class="course-card-title"><%= course.name %></h3>
+          <p class="course-acronym"><%= course.acronym %></p>
+          <p class="course-card-desc"><%= course.shortDescription %></p>
+          <div class="course-meta">
+            <span><i class="fas fa-clock"></i> <%= course.duration %></span>
+            <span><i class="fas fa-signal"></i> <%= course.level %></span>
+          </div>
+        </div>
+        <div class="course-card-footer">
+          <a href="/courses/<%= course.id %>" class="btn btn-primary btn-block">Learn More <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+      <% }); %>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials Bento Grid -->
+<% const activeTestimonials = (testimonials || []).filter(t => t.is_active !== false); %>
+<% if (activeTestimonials.length > 0) { %>
+<section class="section" id="testimonials">
+  <div class="container">
+    <div class="section-header fade-in">
+      <h2 class="section-title">Trusted by Industry Leaders</h2>
+    </div>
+    <div class="testimonials-bento">
+      <!-- Large Card (first testimonial) -->
+      <div class="testimonial-card-bento large fade-in">
+        <i class="fas fa-quote-left quote-icon"></i>
+        <p class="testimonial-quote">"<%= activeTestimonials[0].quote %>"</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar"><%= (activeTestimonials[0].name || 'A').split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase() %></div>
+          <div>
+            <strong><%= activeTestimonials[0].name %></strong>
+            <span><%= activeTestimonials[0].role %><% if (activeTestimonials[0].company) { %>, <%= activeTestimonials[0].company %><% } %></span>
+          </div>
+        </div>
+      </div>
+      <!-- Small Cards (testimonials 2–3) -->
+      <% activeTestimonials.slice(1, 3).forEach((t, i) => { %>
+      <div class="testimonial-card-bento <%= i === 0 ? 'has-border-top' : '' %> fade-in">
+        <p class="testimonial-quote">"<%= t.quote %>"</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar<%= i === 1 ? ' filled' : '' %>"><%= (t.name || 'A').split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase() %></div>
+          <div>
+            <strong><%= t.name %></strong>
+            <span><%= t.role %><% if (t.company) { %>, <%= t.company %><% } %></span>
+          </div>
+        </div>
+      </div>
+      <% }); %>
+      <!-- CTA Banner -->
+      <div class="cta-banner fade-in">
+        <div>
+          <h4><%= (content && content.cta_headline) || 'Join the top 1%' %></h4>
+          <p><%= (content && content.cta_subtext) || 'Limited cohort slots available for enrollment.' %></p>
+        </div>
+        <a href="/courses" class="btn-white">Enroll Today</a>
+      </div>
+      <!-- Small Card 4th testimonial -->
+      <% if (activeTestimonials[3]) { %>
+      <div class="testimonial-card-bento fade-in">
+        <p class="testimonial-quote">"<%= activeTestimonials[3].quote %>"</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar"><%= (activeTestimonials[3].name || 'A').split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase() %></div>
+          <div>
+            <strong><%= activeTestimonials[3].name %></strong>
+            <span><%= activeTestimonials[3].role %><% if (activeTestimonials[3].company) { %>, <%= activeTestimonials[3].company %><% } %></span>
+          </div>
+        </div>
+      </div>
+      <% } %>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<!-- CTA Section -->
+<section class="section cta-section">
+  <div class="container">
+    <div class="cta-content fade-in">
+      <h2>Ready to Transform Your Organization?</h2>
+      <p>Join hundreds of professionals who have mastered the Kanban Method through our accredited courses.</p>
+      <a href="/courses" class="btn btn-primary btn-lg">Get Started Today <i class="fas fa-arrow-right"></i></a>
+    </div>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

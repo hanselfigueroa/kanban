@@ -1,0 +1,97 @@
+<%- include('partials/header') %>
+<%- include('partials/nav') %>
+
+<section class="page-hero">
+  <div class="container">
+    <span class="section-badge">Connect with Excellence</span>
+    <h1 class="page-hero-title">Let's Shape the <span class="text-gradient">Future</span></h1>
+    <p class="page-hero-subtitle">Whether you're looking to scale your engineering team or master the art of Kanban, we're ready to assist.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="contact-grid">
+      <!-- Form -->
+      <div class="contact-form-wrapper fade-in">
+        <i class="fas fa-envelope form-bg-icon"></i>
+        <h2 style="font-size: 1.8rem; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 40px;">Send a Message</h2>
+        <form id="contactForm" novalidate>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label for="contact_name">Full Name <span class="required">*</span></label>
+              <input type="text" id="contact_name" name="full_name" required placeholder="John Doe">
+              <span class="form-error" id="error-contact_name"></span>
+            </div>
+            <div class="form-group">
+              <label for="contact_email">Email Address <span class="required">*</span></label>
+              <input type="email" id="contact_email" name="email" required placeholder="john@example.com">
+              <span class="form-error" id="error-contact_email"></span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="contact_course">Interested Course</label>
+            <select id="contact_course" name="course_selected">
+              <option value="">Select a course (optional)</option>
+              <option value="tkp">Team Kanban Practitioner (TKP)</option>
+              <option value="ksd">Kanban System Design (KSD)</option>
+              <option value="ksi">Kanban Systems Improvement (KSI)</option>
+              <option value="sbk">Scaled Business Kanban (SBK)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="contact_message">Message <span class="required">*</span></label>
+            <textarea id="contact_message" name="message" rows="5" required placeholder="Tell us about your project or goals..."></textarea>
+            <span class="form-error" id="error-contact_message"></span>
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg" id="contactSubmitBtn">
+            <span class="btn-text">Send Inquiry <i class="fas fa-arrow-right"></i></span>
+            <span class="btn-loading" style="display:none"><i class="fas fa-spinner fa-spin"></i> Sending...</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="fade-in">
+        <!-- Contact Details -->
+        <div style="background: var(--surface-container); border: 1px solid var(--card-border); border-radius: 4px; padding: 32px; margin-bottom: 24px;">
+          <div class="contact-methods">
+            <div class="contact-method">
+              <div class="contact-method-icon"><i class="fas fa-at"></i></div>
+              <div>
+                <h4>Email Us</h4>
+                <p>info@kanban.uno</p>
+              </div>
+            </div>
+            <div class="contact-method">
+              <div class="contact-method-icon"><i class="fas fa-phone"></i></div>
+              <div>
+                <h4>Call HQ</h4>
+                <p>+1 (555) 123-4567</p>
+              </div>
+            </div>
+            <div class="contact-method">
+              <div class="contact-method-icon"><i class="fas fa-map-marker-alt"></i></div>
+              <div>
+                <h4>Available</h4>
+                <p>Worldwide - Virtual & In-Person</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Social Links -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <a href="#" style="background: var(--surface-container); border: 1px solid var(--card-border); border-radius: 4px; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; color: var(--text-light); font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; transition: all 0.3s;">
+            LinkedIn <i class="fas fa-arrow-up-right-from-square" style="color: var(--text-gray);"></i>
+          </a>
+          <a href="#" style="background: var(--surface-container); border: 1px solid var(--card-border); border-radius: 4px; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; color: var(--text-light); font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; transition: all 0.3s;">
+            Twitter / X <i class="fas fa-arrow-up-right-from-square" style="color: var(--text-gray);"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

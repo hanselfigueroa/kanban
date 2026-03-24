@@ -1,0 +1,76 @@
+<%- include('partials/header') %>
+<%- include('partials/nav') %>
+
+<section class="page-hero">
+  <div class="container">
+    <span class="section-badge">Learning Paths</span>
+    <h1 class="page-hero-title">Our <span class="text-gradient">Courses</span></h1>
+    <p class="page-hero-subtitle">From beginner to expert - find the perfect Kanban certification for your career</p>
+  </div>
+</section>
+
+<!-- Learning Path -->
+<section class="section">
+  <div class="container">
+    <div class="learning-path fade-in">
+      <div class="path-line"></div>
+      <% const courseList = Object.values(courses); %>
+      <% courseList.forEach((course, index) => { %>
+      <div class="path-step fade-in" style="animation-delay: <%= index * 0.15 %>s">
+        <div class="path-marker" style="background: <%= course.color %>">
+          <i class="fas <%= course.icon %>"></i>
+        </div>
+        <div class="path-content">
+          <span class="course-level-badge" style="background: <%= course.color %>20; color: <%= course.color %>"><%= course.level %></span>
+          <h3><%= course.name %> (<%= course.acronym %>)</h3>
+          <p><%= course.shortDescription %></p>
+          <div class="course-meta">
+            <span><i class="fas fa-clock"></i> <%= course.duration %></span>
+          </div>
+          <a href="/courses/<%= course.id %>" class="btn btn-primary btn-sm">View Details <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+      <% }); %>
+    </div>
+  </div>
+</section>
+
+<!-- Course Cards Grid -->
+<section class="section section-dark">
+  <div class="container">
+    <div class="section-header fade-in">
+      <h2 class="section-title">All <span class="text-gradient">Courses</span></h2>
+    </div>
+    <div class="courses-grid">
+      <% courseList.forEach((course, index) => { %>
+      <div class="course-card fade-in" style="animation-delay: <%= index * 0.1 %>s">
+        <div class="course-card-header" style="border-top: 3px solid <%= course.color %>">
+          <div class="course-icon" style="color: <%= course.color %>">
+            <i class="fas <%= course.icon %>"></i>
+          </div>
+          <span class="course-level"><%= course.level %></span>
+        </div>
+        <div class="course-card-body">
+          <h3 class="course-card-title"><%= course.name %></h3>
+          <p class="course-acronym"><%= course.acronym %></p>
+          <p class="course-card-desc"><%= course.shortDescription %></p>
+          <ul class="course-highlights">
+            <% course.outcomes.slice(0, 3).forEach(outcome => { %>
+            <li><i class="fas fa-check"></i> <%= outcome %></li>
+            <% }); %>
+          </ul>
+          <div class="course-meta">
+            <span><i class="fas fa-clock"></i> <%= course.duration %></span>
+            <span><i class="fas fa-signal"></i> <%= course.level %></span>
+          </div>
+        </div>
+        <div class="course-card-footer">
+          <a href="/courses/<%= course.id %>" class="btn btn-primary btn-block">Learn More <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+      <% }); %>
+    </div>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

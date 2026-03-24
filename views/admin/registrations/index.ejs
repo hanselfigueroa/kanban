@@ -1,0 +1,204 @@
+<%- include('../partials/head', { title: 'Registrations - Kanban.UNO Admin' }) %>
+</head>
+<body>
+<div class="admin-wrapper">
+
+  <%- include('../partials/sidebar') %>
+
+  <div class="admin-main">
+    <%- include('../partials/topbar', { pageTitle: 'Registrations' }) %>
+
+    <div class="admin-content">
+
+      <div class="content-header">
+        <h2 class="content-title">
+          Registrations
+          <% if (pagination && pagination.total) { %>
+            <span class="count-badge"><%= pagination.total %> total</span>
+          <% } %>
+        </h2>
+        <a href="/admin/registrations/export" class="btn btn-secondary">
+          <i class="fas fa-file-csv"></i>
+          Export CSV
+        </a>
+      </div>
+
+      <!-- Filter Bar -->
+      <form method="GET" action="/admin/registrations" class="filter-bar">
+        <div class="filter-group filter-group-search">
+          <label for="searchInput" class="filter-label">Search</label>
+          <div class="search-input-wrapper">
+            <i class="fas fa-search search-input-icon"></i>
+            <input
+              type="text"
+              id="searchInput"
+              name="search"
+              class="form-input form-input-sm"
+              placeholder="Name, email, phone..."
+              value="<%= (typeof filters !== 'undefined' && filters.search) ? filters.search : '' %>"
+            >
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <label for="filterCourse" class="filter-label">Course</label>
+          <select id="filterCourse" name="course" class="form-select form-select-sm">
+            <option value="">All Courses</option>
+            <% if (courses && courses.length > 0) { %>
+              <% courses.forEach(function(c) { %>
+                <option value="<%= c.course_id %>" <%= (typeof filters !== 'undefined' && filters.course === c.course_id) ? 'selected' : '' %>>
+                  <%= c.acronym %> - <%= c.name %>
+                </option>
+              <% }); %>
+            <% } %>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="filterStatus" class="filter-label">Status</label>
+          <select id="filterStatus" name="status" class="form-select form-select-sm">
+            <option value="">All Statuses</option>
+            <option value="pending" <%= (typeof filters !== 'undefined' && filters.status === 'pending') ? 'selected' : '' %>>Pending</option>
+            <option value="contacted" <%= (typeof filters !== 'undefined' && filters.status === 'contacted') ? 'selected' : '' %>>Contacted</option>
+            <option value="confirmed" <%= (typeof filters !== 'undefined' && filters.status === 'confirmed') ? 'selected' : '' %>>Confirmed</option>
+            <option value="cancelled" <%= (typeof filters !== 'undefined' && filters.status === 'cancelled') ? 'selected' : '' %>>Cancelled</option>
+          </select>
+        </div>
+
+        <div class="filter-actions">
+          <button type="submit" class="btn btn-secondary">
+            <i class="fas fa-filter"></i>
+            Filter
+          </button>
+          <a href="/admin/registrations" class="btn btn-ghost">
+            <i class="fas fa-times"></i>
+            Clear Filters
+          </a>
+        </div>
+      </form>
+
+      <!-- Table -->
+      <% if (registrations && registrations.length > 0) { %>
+        <div class="table-card table-card-scroll">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>#ID</th>
+                <th>Date</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Course</th>
+                <th>Preferred Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% registrations.forEach(function(r) { %>
+                <tr>
+                  <td class="id-cell">
+                    <a href="/admin/registrations/<%= r.id %>" class="id-link">#<%= r.id %></a>
+                  </td>
+                  <td class="date-cell">
+                    <%= r.created_at ? new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—' %>
+                  </td>
+                  <td>
+                    <span class="name-cell"><%= r.first_name || '' %> <%= r.last_name || '' %></span>
+                  </td>
+                  <td>
+                    <a href="mailto:<%= r.email %>" class="email-link"><%= r.email %></a>
+                  </td>
+                  <td><%= r.phone || '—' %></td>
+                  <td>
+                    <span class="course-acronym"><%= r.course_acronym || r.course_id || '—' %></span>
+                  </td>
+                  <td>
+                    <%= r.preferred_date ? new Date(r.preferred_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—' %>
+                  </td>
+                  <td>
+                    <select
+                      class="status-select"
+                      data-reg-id="<%= r.id %>"
+                    >
+                      <option value="pending" <%= r.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                      <option value="contacted" <%= r.status === 'contacted' ? 'selected' : '' %>>Contacted</option>
+                      <option value="confirmed" <%= r.status === 'confirmed' ? 'selected' : '' %>>Confirmed</option>
+                      <option value="cancelled" <%= r.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+                    </select>
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      <a href="/admin/registrations/<%= r.id %>" class="btn btn-sm btn-secondary" title="View">
+                        <i class="fas fa-eye"></i>
+                        View
+                      </a>
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-danger"
+                        data-delete-url="/api/admin/registrations/<%= r.id %>"
+                        data-confirm="Delete this registration? This cannot be undone."
+                        title="Delete"
+                      >
+                        <i class="fas fa-trash"></i>
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <% if (pagination && pagination.total > pagination.perPage) { %>
+          <div class="pagination">
+            <%
+              var totalPages = Math.ceil(pagination.total / pagination.perPage);
+              var currentPage = pagination.page;
+            %>
+
+            <% if (currentPage > 1) { %>
+              <a href="?page=<%= currentPage - 1 %><%= (typeof filters !== 'undefined' && filters.search) ? '&search=' + encodeURIComponent(filters.search) : '' %><%= (typeof filters !== 'undefined' && filters.course) ? '&course=' + filters.course : '' %><%= (typeof filters !== 'undefined' && filters.status) ? '&status=' + filters.status : '' %>" class="pagination-btn">
+                <i class="fas fa-chevron-left"></i>
+                Previous
+              </a>
+            <% } %>
+
+            <span class="pagination-info">
+              Page <%= currentPage %> of <%= totalPages %>
+              &nbsp;&mdash;&nbsp;
+              <%= pagination.total %> total
+            </span>
+
+            <% if (currentPage < totalPages) { %>
+              <a href="?page=<%= currentPage + 1 %><%= (typeof filters !== 'undefined' && filters.search) ? '&search=' + encodeURIComponent(filters.search) : '' %><%= (typeof filters !== 'undefined' && filters.course) ? '&course=' + filters.course : '' %><%= (typeof filters !== 'undefined' && filters.status) ? '&status=' + filters.status : '' %>" class="pagination-btn">
+                Next
+                <i class="fas fa-chevron-right"></i>
+              </a>
+            <% } %>
+          </div>
+        <% } %>
+
+      <% } else { %>
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <i class="fas fa-inbox"></i>
+          </div>
+          <h3 class="empty-state-title">No Registrations Found</h3>
+          <p class="empty-state-text">
+            <% if (typeof filters !== 'undefined' && (filters.search || filters.course || filters.status)) { %>
+              No registrations match your current filters.
+            <% } else { %>
+              Registrations will appear here when people sign up through the site.
+            <% } %>
+          </p>
+        </div>
+      <% } %>
+
+    </div><!-- /.admin-content -->
+  </div><!-- /.admin-main -->
+</div><!-- /.admin-wrapper -->
+
+<%- include('../partials/scripts') %>

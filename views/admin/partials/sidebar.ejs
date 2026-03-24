@@ -1,0 +1,64 @@
+<div class="admin-sidebar" id="adminSidebar">
+  <button class="sidebar-close-btn" id="sidebarClose" aria-label="Close sidebar">&times;</button>
+
+  <div class="sidebar-logo">
+    <a href="/admin/dashboard" class="logo-link">KANBAN.<span class="logo-highlight">UNO</span></a>
+    <span class="sidebar-label">ADMIN PANEL</span>
+  </div>
+
+  <nav class="sidebar-nav">
+
+    <div class="nav-group">
+      <span class="nav-group-label">OVERVIEW</span>
+      <a href="/admin/dashboard" class="nav-item <%= currentPage === 'dashboard' ? 'active' : '' %>">
+        <i class="fas fa-chart-pie"></i>
+        <span>Dashboard</span>
+      </a>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-group-label">CATALOG</span>
+      <a href="/admin/courses" class="nav-item <%= currentPage === 'courses' ? 'active' : '' %>">
+        <i class="fas fa-book-open"></i>
+        <span>Courses</span>
+      </a>
+      <a href="/admin/dates" class="nav-item <%= currentPage === 'dates' ? 'active' : '' %>">
+        <i class="fas fa-calendar-alt"></i>
+        <span>Course Dates</span>
+      </a>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-group-label">SALES</span>
+      <a href="/admin/registrations" class="nav-item <%= currentPage === 'registrations' ? 'active' : '' %>">
+        <i class="fas fa-inbox"></i>
+        <span>Registrations</span>
+      </a>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-group-label">SITE</span>
+      <a href="/admin/content" class="nav-item <%= currentPage === 'content' ? 'active' : '' %>">
+        <i class="fas fa-edit"></i>
+        <span>Page Content</span>
+      </a>
+      <a href="/admin/testimonials" class="nav-item <%= currentPage === 'testimonials' ? 'active' : '' %>">
+        <i class="fas fa-star"></i>
+        <span>Testimonials</span>
+      </a>
+    </div>
+
+    <div class="nav-group nav-group-bottom">
+      <a href="/" target="_blank" class="nav-item">
+        <i class="fas fa-external-link-alt"></i>
+        <span>View Site</span>
+      </a>
+      <a href="/admin/logout" class="nav-item nav-item-logout">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Logout</span>
+      </a>
+    </div>
+
+  </nav>
+</div>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>

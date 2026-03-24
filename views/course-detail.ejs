@@ -1,0 +1,284 @@
+<%- include('partials/header') %>
+<%- include('partials/nav') %>
+
+<!-- Schema.org structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Course",
+  "name": "<%= course.name %>",
+  "description": "<%= course.description %>",
+  "provider": { "@type": "Organization", "name": "Kanban.UNO" },
+  "educationalLevel": "<%= course.level %>"
+}
+</script>
+
+<!-- Breadcrumb -->
+<section class="breadcrumb-section">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="/">Home</a>
+      <span class="breadcrumb-sep"><i class="fas fa-chevron-right"></i></span>
+      <a href="/courses">Courses</a>
+      <span class="breadcrumb-sep"><i class="fas fa-chevron-right"></i></span>
+      <span class="breadcrumb-current"><%= course.acronym %></span>
+    </nav>
+  </div>
+</section>
+
+<!-- Course Hero -->
+<section class="course-hero" style="border-top: 2px solid <%= course.color %>">
+  <div class="container">
+    <div class="course-hero-content">
+      <span class="course-level-badge" style="background: <%= course.color %>20; color: <%= course.color %>"><%= course.level %></span>
+      <h1><%= course.name %></h1>
+      <p class="course-acronym-lg"><%= course.acronym %></p>
+      <p class="course-hero-desc"><%= course.description %></p>
+      <div class="course-hero-meta">
+        <span><i class="fas fa-clock"></i> Duration: <%= course.duration %></span>
+        <span><i class="fas fa-signal"></i> Level: <%= course.level %></span>
+        <span><i class="fas fa-tag"></i> <%= course.price %></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Course Detail Layout -->
+<section class="section">
+  <div class="container">
+    <div class="course-detail-grid">
+
+      <!-- Main Content -->
+      <div class="course-detail-main">
+
+        <!-- Upcoming Dates -->
+        <% if (upcomingDates && upcomingDates.length > 0) { %>
+        <div class="upcoming-dates-section fade-in">
+          <div class="section-header-left" style="margin-bottom: 24px;">
+            <div class="section-line"></div>
+            <h2 class="section-title" style="font-size: 1.4rem;">Upcoming Dates</h2>
+          </div>
+          <div class="dates-grid">
+            <% upcomingDates.forEach(date => { %>
+            <div class="date-card" data-date-id="<%= date.id %>">
+              <div class="date-card-header">
+                <span class="format-badge format-<%= date.format.toLowerCase().replace(' ','-') %>">
+                  <i class="fas <%= date.format === 'In-Person' ? 'fa-map-marker-alt' : 'fa-video' %>"></i>
+                  <%= date.format %>
+                </span>
+                <% if (date.max_participants) { %>
+                  <% const spots = date.max_participants - date.current_participants; %>
+                  <span class="spots-badge <%= spots <= 3 ? 'spots-low' : '' %>">
+                    <%= spots > 0 ? spots + ' spots left' : 'Full' %>
+                  </span>
+                <% } %>
+              </div>
+              <div class="date-card-body">
+                <div class="date-display">
+                  <i class="fas fa-calendar-alt" style="color: var(--primary-purple); margin-right: 8px;"></i>
+                  <strong>
+                    <%= new Date(date.start_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) %>
+                    <% if (date.end_date) { %>
+                    – <%= new Date(date.end_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) %>
+                    <% } %>
+                  </strong>
+                </div>
+                <% if (date.location) { %>
+                <div class="date-location">
+                  <i class="fas fa-map-marker-alt" style="color: var(--text-muted); margin-right: 8px;"></i>
+                  <%= date.location %>
+                </div>
+                <% } %>
+                <% if (date.timezone) { %>
+                <div class="date-tz" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 6px;">
+                  Timezone: <%= date.timezone %>
+                </div>
+                <% } %>
+              </div>
+              <button class="btn btn-primary btn-block btn-sm select-date-btn" data-date-id="<%= date.id %>">
+                Select This Date
+              </button>
+            </div>
+            <% }); %>
+          </div>
+          <p class="custom-date-note">
+            <i class="fas fa-info-circle"></i>
+            Don't see a suitable date? <a href="/contact">Contact us</a> for custom scheduling.
+          </p>
+        </div>
+        <% } else { %>
+        <div class="no-dates-notice fade-in">
+          <i class="fas fa-calendar-plus"></i>
+          <p>No upcoming dates scheduled yet. <a href="/contact">Contact us</a> to request a session or be notified when dates are added.</p>
+        </div>
+        <% } %>
+
+        <!-- Tabs -->
+        <div class="tabs" role="tablist" style="margin-top: 40px;">
+          <button class="tab active" data-tab="curriculum" role="tab" aria-selected="true">Curriculum</button>
+          <button class="tab" data-tab="audience" role="tab" aria-selected="false">Who Should Attend</button>
+          <button class="tab" data-tab="outcomes" role="tab" aria-selected="false">Learning Outcomes</button>
+        </div>
+
+        <!-- Curriculum Tab -->
+        <div class="tab-content active" id="tab-curriculum" role="tabpanel">
+          <% course.curriculum.forEach((module, i) => { %>
+          <div class="curriculum-module fade-in" style="animation-delay: <%= i * 0.1 %>s">
+            <h3><span class="module-num"><%= String(i + 1).padStart(2, '0') %></span> <%= module.title.replace(/^Module \d+:\s*/, '') %></h3>
+            <ul>
+              <% module.topics.forEach(topic => { %>
+              <li><i class="fas fa-check-circle" style="color: <%= course.color %>"></i> <%= topic %></li>
+              <% }); %>
+            </ul>
+          </div>
+          <% }); %>
+        </div>
+
+        <!-- Audience Tab -->
+        <div class="tab-content" id="tab-audience" role="tabpanel">
+          <div class="audience-list">
+            <% course.audience.forEach(item => { %>
+            <div class="audience-item fade-in">
+              <i class="fas fa-user-check" style="color: <%= course.color %>"></i>
+              <span><%= item %></span>
+            </div>
+            <% }); %>
+          </div>
+        </div>
+
+        <!-- Outcomes Tab -->
+        <div class="tab-content" id="tab-outcomes" role="tabpanel">
+          <div class="outcomes-list">
+            <% course.outcomes.forEach((outcome, i) => { %>
+            <div class="outcome-item fade-in" style="animation-delay: <%= i * 0.1 %>s">
+              <div class="outcome-number" style="background: <%= course.color %>"><%= i + 1 %></div>
+              <p><%= outcome %></p>
+            </div>
+            <% }); %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar Registration Form -->
+      <aside class="course-detail-sidebar">
+        <div class="registration-card" id="registrationCard">
+          <h3>Register Your Interest</h3>
+          <p>Fill out the form and we'll get back to you with details and pricing.</p>
+          <form id="registrationForm" novalidate>
+            <input type="hidden" name="course_selected" value="<%= course.id %>">
+            <input type="hidden" name="course_date_id" id="selectedDateId" value="">
+
+            <% if (upcomingDates && upcomingDates.length > 0) { %>
+            <div class="form-group">
+              <label for="preferred_date_select">Preferred Date</label>
+              <select id="preferred_date_select" name="preferred_date_select">
+                <option value="">Select a date (optional)</option>
+                <% upcomingDates.forEach(date => { %>
+                <option value="<%= date.id %>">
+                  <%= new Date(date.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+                  — <%= date.format %>
+                </option>
+                <% }); %>
+                <option value="other">Other / Contact me</option>
+              </select>
+            </div>
+            <% } %>
+
+            <div class="form-group">
+              <label for="full_name">Full Name <span class="required">*</span></label>
+              <input type="text" id="full_name" name="full_name" required placeholder="John Doe">
+              <span class="form-error" id="error-full_name"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email Address <span class="required">*</span></label>
+              <input type="email" id="email" name="email" required placeholder="john@company.com">
+              <span class="form-error" id="error-email"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <input type="tel" id="phone" name="phone" placeholder="+1 (555) 123-4567">
+            </div>
+
+            <div class="form-group">
+              <label for="company">Company</label>
+              <input type="text" id="company" name="company" placeholder="Your Company">
+            </div>
+
+            <div class="form-group">
+              <label for="preferred_format">Preferred Format</label>
+              <select id="preferred_format" name="preferred_format">
+                <option value="">Select format...</option>
+                <option value="in-person">In-Person</option>
+                <option value="virtual">Virtual / Online</option>
+                <option value="either">No Preference</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="message">Message</label>
+              <textarea id="message" name="message" rows="3" placeholder="Any questions or special requirements?"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg" id="submitBtn">
+              <span class="btn-text">Submit Registration</span>
+              <span class="btn-loading" style="display:none"><i class="fas fa-spinner fa-spin"></i> Submitting...</span>
+            </button>
+          </form>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- Other Courses -->
+<section class="section section-dark">
+  <div class="container">
+    <div class="section-header fade-in">
+      <h2 class="section-title">Explore Other <span class="text-gradient">Courses</span></h2>
+    </div>
+    <div class="courses-grid">
+      <% Object.values(courses).filter(c => c.id !== course.id).forEach((c, index) => { %>
+      <div class="course-card fade-in" style="animation-delay: <%= index * 0.1 %>s">
+        <div class="course-card-header" style="border-top: 2px solid <%= c.color %>">
+          <div class="course-icon" style="color: <%= c.color %>"><i class="fas <%= c.icon %>"></i></div>
+          <span class="course-level"><%= c.level %></span>
+        </div>
+        <div class="course-card-body">
+          <h3 class="course-card-title"><%= c.name %></h3>
+          <p class="course-acronym"><%= c.acronym %></p>
+          <p class="course-card-desc"><%= c.shortDescription %></p>
+        </div>
+        <div class="course-card-footer">
+          <a href="/courses/<%= c.id %>" class="btn btn-primary btn-block">Learn More <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+      <% }); %>
+    </div>
+  </div>
+</section>
+
+<%- include('partials/footer') %>
+
+<script>
+// Sync date card selection with hidden field + form select
+document.querySelectorAll('.select-date-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const dateId = btn.dataset.dateId;
+    document.getElementById('selectedDateId').value = dateId;
+    const sel = document.getElementById('preferred_date_select');
+    if (sel) sel.value = dateId;
+    document.querySelectorAll('.date-card').forEach(c => c.classList.remove('selected'));
+    btn.closest('.date-card').classList.add('selected');
+    btn.textContent = '✓ Selected';
+    document.getElementById('registrationCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+});
+const dateSelect = document.getElementById('preferred_date_select');
+if (dateSelect) {
+  dateSelect.addEventListener('change', () => {
+    document.getElementById('selectedDateId').value = dateSelect.value;
+  });
+}
+</script>

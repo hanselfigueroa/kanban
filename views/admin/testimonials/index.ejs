@@ -1,0 +1,400 @@
+<%- include('../partials/head', { title: 'Testimonials - Kanban.UNO Admin' }) %>
+</head>
+<body>
+<div class="admin-wrapper">
+
+  <%- include('../partials/sidebar') %>
+
+  <div class="admin-main">
+    <%- include('../partials/topbar', { pageTitle: 'Testimonials' }) %>
+
+    <div class="admin-content">
+
+      <div class="content-header">
+        <h2 class="content-title">Testimonials</h2>
+        <button class="btn btn-primary" id="toggleAddForm">
+          <i class="fas fa-plus"></i>
+          Add Testimonial
+        </button>
+      </div>
+
+      <!-- Add / Edit Form -->
+      <div class="content-card" id="testimonialForm" style="display:none;">
+        <div class="content-card-header">
+          <h3 class="content-card-title" id="formTitle">Add Testimonial</h3>
+        </div>
+        <form id="testimonialFormEl" method="POST" action="/admin/testimonials">
+          <input type="hidden" name="_method" id="formMethod" value="POST">
+          <input type="hidden" name="id" id="fieldId" value="">
+
+          <div class="form-grid form-grid-3">
+            <div class="form-group">
+              <label class="form-label" for="fieldClientName">Client Name <span class="required">*</span></label>
+              <input type="text" class="form-control" id="fieldClientName" name="client_name" required placeholder="Jane Smith">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="fieldClientTitle">Job Title</label>
+              <input type="text" class="form-control" id="fieldClientTitle" name="client_title" placeholder="Head of Operations">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="fieldClientCompany">Company</label>
+              <input type="text" class="form-control" id="fieldClientCompany" name="client_company" placeholder="Acme Corp">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="fieldTestimonialText">Testimonial <span class="required">*</span></label>
+            <textarea class="form-control" id="fieldTestimonialText" name="testimonial_text" rows="4" required placeholder="What did the client say about the course?"></textarea>
+          </div>
+
+          <div class="form-grid form-grid-3">
+            <div class="form-group">
+              <label class="form-label">Rating</label>
+              <div class="star-picker" id="starPicker">
+                <button type="button" class="star-btn" data-value="1" aria-label="1 star"><i class="fas fa-star"></i></button>
+                <button type="button" class="star-btn" data-value="2" aria-label="2 stars"><i class="fas fa-star"></i></button>
+                <button type="button" class="star-btn" data-value="3" aria-label="3 stars"><i class="fas fa-star"></i></button>
+                <button type="button" class="star-btn" data-value="4" aria-label="4 stars"><i class="fas fa-star"></i></button>
+                <button type="button" class="star-btn" data-value="5" aria-label="5 stars"><i class="fas fa-star"></i></button>
+              </div>
+              <input type="hidden" id="fieldRating" name="rating" value="5">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="fieldDisplayOrder">Display Order</label>
+              <input type="number" class="form-control" id="fieldDisplayOrder" name="display_order" value="0" min="0">
+            </div>
+            <div class="form-group form-group-check">
+              <label class="checkbox-label">
+                <input type="checkbox" id="fieldIsActive" name="is_active" value="1" checked>
+                <span class="checkbox-custom"></span>
+                Active (visible on site)
+              </label>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+              <i class="fas fa-save"></i>
+              Save Testimonial
+            </button>
+            <button type="button" class="btn btn-secondary" id="cancelFormBtn">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Testimonials List -->
+      <% if (testimonials && testimonials.length > 0) { %>
+        <div
+          class="sortable-list"
+          id="testimonialsList"
+          data-sortable
+          data-reorder-url="/api/admin/testimonials/reorder"
+        >
+          <% testimonials.forEach(function(t) { %>
+            <%
+              var initials = t.client_name
+                ? t.client_name.trim().split(/\s+/).slice(0, 2).map(function(w){ return w[0].toUpperCase(); }).join('')
+                : '?';
+              var preview = t.testimonial_text
+                ? (t.testimonial_text.length > 100 ? t.testimonial_text.substring(0, 100) + '…' : t.testimonial_text)
+                : '';
+            %>
+            <div
+              class="testimonial-card sortable-item"
+              data-id="<%= t.id %>"
+              data-client-name="<%= t.client_name %>"
+              data-client-title="<%= t.client_title || '' %>"
+              data-client-company="<%= t.client_company || '' %>"
+              data-testimonial-text="<%= t.testimonial_text %>"
+              data-rating="<%= t.rating || 5 %>"
+              data-is-active="<%= t.is_active ? '1' : '0' %>"
+              data-display-order="<%= t.display_order || 0 %>"
+            >
+              <div class="testimonial-drag-handle" title="Drag to reorder">
+                <i class="fas fa-grip-vertical"></i>
+              </div>
+
+              <div class="testimonial-avatar" style="background:var(--color-purple, #7c3aed);">
+                <%= initials %>
+              </div>
+
+              <div class="testimonial-body">
+                <div class="testimonial-meta">
+                  <span class="testimonial-name"><%= t.client_name %></span>
+                  <% if (t.client_title || t.client_company) { %>
+                    <span class="testimonial-role">
+                      <%= [t.client_title, t.client_company].filter(Boolean).join(' · ') %>
+                    </span>
+                  <% } %>
+                </div>
+                <div class="testimonial-stars">
+                  <% for (var s = 1; s <= 5; s++) { %>
+                    <i class="fas fa-star <%= s <= (t.rating || 5) ? 'star-filled' : 'star-empty' %>"></i>
+                  <% } %>
+                </div>
+                <p class="testimonial-preview"><%= preview %></p>
+              </div>
+
+              <div class="testimonial-side">
+                <% if (t.is_active) { %>
+                  <span class="badge badge-success">Active</span>
+                <% } else { %>
+                  <span class="badge badge-inactive">Inactive</span>
+                <% } %>
+                <div class="action-buttons">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-secondary btn-edit-testimonial"
+                    title="Edit"
+                  >
+                    <i class="fas fa-pencil-alt"></i>
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm <%= t.is_active ? 'btn-warning' : 'btn-success' %> btn-toggle-active"
+                    data-id="<%= t.id %>"
+                    data-active="<%= t.is_active ? '1' : '0' %>"
+                    title="<%= t.is_active ? 'Deactivate' : 'Activate' %>"
+                  >
+                    <i class="fas <%= t.is_active ? 'fa-toggle-off' : 'fa-toggle-on' %>"></i>
+                    <%= t.is_active ? 'Deactivate' : 'Activate' %>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-danger btn-delete-testimonial"
+                    data-id="<%= t.id %>"
+                    data-delete-url="/admin/testimonials/<%= t.id %>"
+                    data-name="<%= t.client_name %>"
+                    title="Delete"
+                  >
+                    <i class="fas fa-trash-alt"></i>
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      <% } else { %>
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <i class="fas fa-star"></i>
+          </div>
+          <h3 class="empty-state-title">No Testimonials Yet</h3>
+          <p class="empty-state-text">Add your first testimonial to showcase client feedback on the site.</p>
+          <button class="btn btn-primary" id="emptyAddBtn">
+            <i class="fas fa-plus"></i>
+            Add Testimonial
+          </button>
+        </div>
+      <% } %>
+
+    </div><!-- /.admin-content -->
+  </div><!-- /.admin-main -->
+</div><!-- /.admin-wrapper -->
+
+<%- include('../partials/scripts') %>
+
+<script>
+(function () {
+
+  var form        = document.getElementById('testimonialForm');
+  var formEl      = document.getElementById('testimonialFormEl');
+  var formTitle   = document.getElementById('formTitle');
+  var formMethod  = document.getElementById('formMethod');
+  var fieldId     = document.getElementById('fieldId');
+  var fieldName   = document.getElementById('fieldClientName');
+  var fieldTitle  = document.getElementById('fieldClientTitle');
+  var fieldCo     = document.getElementById('fieldClientCompany');
+  var fieldText   = document.getElementById('fieldTestimonialText');
+  var fieldRating = document.getElementById('fieldRating');
+  var fieldOrder  = document.getElementById('fieldDisplayOrder');
+  var fieldActive = document.getElementById('fieldIsActive');
+  var submitBtn   = document.getElementById('submitBtn');
+
+  // ── Show / hide form ───────────────────────────────────────────────────────
+  function showForm(editMode) {
+    form.style.display = 'block';
+    formTitle.textContent = editMode ? 'Edit Testimonial' : 'Add Testimonial';
+    submitBtn.innerHTML = editMode
+      ? '<i class="fas fa-save"></i> Update Testimonial'
+      : '<i class="fas fa-save"></i> Save Testimonial';
+    form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function hideForm() {
+    form.style.display = 'none';
+    resetForm();
+  }
+
+  function resetForm() {
+    formEl.action = '/admin/testimonials';
+    formMethod.value = 'POST';
+    fieldId.value = '';
+    formEl.reset();
+    setRating(5);
+  }
+
+  document.getElementById('toggleAddForm').addEventListener('click', function () {
+    if (form.style.display === 'none' || form.style.display === '') {
+      resetForm();
+      showForm(false);
+    } else {
+      hideForm();
+    }
+  });
+
+  document.getElementById('cancelFormBtn').addEventListener('click', hideForm);
+
+  var emptyAdd = document.getElementById('emptyAddBtn');
+  if (emptyAdd) {
+    emptyAdd.addEventListener('click', function () {
+      resetForm();
+      showForm(false);
+    });
+  }
+
+  // ── Star picker ───────────────────────────────────────────────────────────
+  function setRating(value) {
+    fieldRating.value = value;
+    document.querySelectorAll('.star-btn').forEach(function (btn) {
+      var v = parseInt(btn.dataset.value, 10);
+      btn.classList.toggle('active', v <= value);
+    });
+  }
+
+  setRating(5);
+
+  document.querySelectorAll('.star-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      setRating(parseInt(btn.dataset.value, 10));
+    });
+    btn.addEventListener('mouseenter', function () {
+      var hv = parseInt(btn.dataset.value, 10);
+      document.querySelectorAll('.star-btn').forEach(function (b) {
+        b.classList.toggle('hover', parseInt(b.dataset.value, 10) <= hv);
+      });
+    });
+    btn.addEventListener('mouseleave', function () {
+      document.querySelectorAll('.star-btn').forEach(function (b) { b.classList.remove('hover'); });
+    });
+  });
+
+  // ── Edit button ───────────────────────────────────────────────────────────
+  document.querySelectorAll('.btn-edit-testimonial').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var card = btn.closest('.testimonial-card');
+      var id   = card.dataset.id;
+
+      formEl.action = '/admin/testimonials/' + id + '?_method=PUT';
+      formMethod.value = 'PUT';
+      fieldId.value    = id;
+      fieldName.value  = card.dataset.clientName;
+      fieldTitle.value = card.dataset.clientTitle;
+      fieldCo.value    = card.dataset.clientCompany;
+      fieldText.value  = card.dataset.testimonialText;
+      fieldOrder.value = card.dataset.displayOrder;
+      fieldActive.checked = card.dataset.isActive === '1';
+      setRating(parseInt(card.dataset.rating, 10) || 5);
+
+      showForm(true);
+    });
+  });
+
+  // ── Toggle active ─────────────────────────────────────────────────────────
+  document.querySelectorAll('.btn-toggle-active').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var id      = btn.dataset.id;
+      var current = btn.dataset.active === '1';
+      var newVal  = !current;
+
+      fetch('/api/admin/testimonials/' + id + '/toggle', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_active: newVal })
+      })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (data.success) {
+            showToast((newVal ? 'Activated' : 'Deactivated') + ' successfully.', 'success');
+            setTimeout(function () { window.location.reload(); }, 800);
+          } else {
+            showToast(data.message || 'Update failed.', 'error');
+          }
+        })
+        .catch(function () { showToast('Network error.', 'error'); });
+    });
+  });
+
+  // ── Delete ────────────────────────────────────────────────────────────────
+  document.querySelectorAll('.btn-delete-testimonial').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var name = btn.dataset.name || 'this testimonial';
+      if (!confirm('Delete testimonial from "' + name + '"? This cannot be undone.')) return;
+
+      fetch(btn.dataset.deleteUrl, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+      })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (data.success) {
+            showToast('Testimonial deleted.', 'success');
+            setTimeout(function () { window.location.reload(); }, 800);
+          } else {
+            showToast(data.message || 'Delete failed.', 'error');
+          }
+        })
+        .catch(function () { showToast('Network error.', 'error'); });
+    });
+  });
+
+  // ── Drag-to-reorder (SortableJS) ─────────────────────────────────────────
+  var list = document.getElementById('testimonialsList');
+  if (list && typeof Sortable !== 'undefined') {
+    Sortable.create(list, {
+      handle: '.testimonial-drag-handle',
+      animation: 150,
+      onEnd: function () {
+        var ids = Array.from(list.querySelectorAll('.testimonial-card')).map(function (c) {
+          return c.dataset.id;
+        });
+        fetch(list.dataset.reorderUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ order: ids })
+        })
+          .then(function (res) { return res.json(); })
+          .then(function (data) {
+            if (data.success) {
+              showToast('Order saved.', 'success');
+            } else {
+              showToast('Failed to save order.', 'error');
+            }
+          })
+          .catch(function () { showToast('Network error.', 'error'); });
+      }
+    });
+  }
+
+  // ── Toast helper ──────────────────────────────────────────────────────────
+  function showToast(message, type) {
+    var container = document.getElementById('toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'toast-container';
+      container.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:10px;';
+      document.body.appendChild(container);
+    }
+    var toast = document.createElement('div');
+    toast.style.cssText = 'background:' + (type === 'success' ? '#10b981' : '#ef4444') + ';color:#fff;padding:12px 20px;border-radius:8px;font-size:14px;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,.15);display:flex;align-items:center;gap:8px;min-width:240px;';
+    toast.innerHTML = '<i class="fas ' + (type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle') + '"></i>' + message;
+    container.appendChild(toast);
+    setTimeout(function () { toast.remove(); }, 3500);
+  }
+
+})();
+</script>

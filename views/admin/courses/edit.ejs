@@ -1,0 +1,305 @@
+<%- include('../partials/head', { title: (isNew ? 'New Course' : 'Edit Course') + ' - Kanban.UNO Admin' }) %>
+</head>
+<body>
+<div class="admin-wrapper">
+
+  <%- include('../partials/sidebar') %>
+
+  <div class="admin-main">
+    <%- include('../partials/topbar', { pageTitle: isNew ? 'New Course' : 'Edit Course' }) %>
+
+    <div class="admin-content">
+
+      <div class="breadcrumb">
+        <a href="/admin/courses" class="breadcrumb-link">Courses</a>
+        <i class="fas fa-chevron-right breadcrumb-sep"></i>
+        <span class="breadcrumb-current"><%= isNew ? 'New Course' : 'Edit Course' %></span>
+      </div>
+
+      <form
+        action="<%= isNew ? '/admin/courses' : '/admin/courses/' + course.id %>"
+        method="POST"
+        class="edit-form"
+      >
+        <% if (!isNew) { %>
+          <input type="hidden" name="_method" value="PUT">
+        <% } %>
+
+        <!-- Section 1: Basic Info -->
+        <div class="form-card">
+          <div class="form-card-header">
+            <h3 class="form-card-title">
+              <i class="fas fa-info-circle"></i>
+              Basic Info
+            </h3>
+          </div>
+          <div class="form-card-body">
+            <div class="form-grid form-grid-2">
+
+              <div class="form-group">
+                <label for="course_id" class="form-label">Course ID <span class="required">*</span></label>
+                <input
+                  type="text"
+                  id="course_id"
+                  name="course_id"
+                  class="form-input"
+                  value="<%= course ? course.course_id : '' %>"
+                  <%= !isNew ? 'readonly' : '' %>
+                  placeholder="e.g. KAN-101"
+                  required
+                >
+                <% if (!isNew) { %>
+                  <span class="form-hint">Course ID cannot be changed after creation.</span>
+                <% } %>
+              </div>
+
+              <div class="form-group">
+                <label for="acronym" class="form-label">Acronym <span class="required">*</span></label>
+                <input
+                  type="text"
+                  id="acronym"
+                  name="acronym"
+                  class="form-input"
+                  value="<%= course ? course.acronym : '' %>"
+                  placeholder="e.g. KAN"
+                  required
+                >
+              </div>
+
+              <div class="form-group form-group-full">
+                <label for="name" class="form-label">Course Name <span class="required">*</span></label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  class="form-input"
+                  value="<%= course ? course.name : '' %>"
+                  placeholder="Full course name"
+                  required
+                >
+              </div>
+
+              <div class="form-group form-group-full">
+                <label for="tagline" class="form-label">Tagline</label>
+                <input
+                  type="text"
+                  id="tagline"
+                  name="tagline"
+                  class="form-input"
+                  value="<%= course ? course.tagline : '' %>"
+                  placeholder="Short marketing tagline"
+                >
+              </div>
+
+              <div class="form-group">
+                <label for="level" class="form-label">Level <span class="required">*</span></label>
+                <select id="level" name="level" class="form-select" required>
+                  <option value="">Select level...</option>
+                  <option value="Beginner" <%= (course && course.level === 'Beginner') ? 'selected' : '' %>>Beginner</option>
+                  <option value="Intermediate" <%= (course && course.level === 'Intermediate') ? 'selected' : '' %>>Intermediate</option>
+                  <option value="Advanced" <%= (course && course.level === 'Advanced') ? 'selected' : '' %>>Advanced</option>
+                  <option value="All Levels" <%= (course && course.level === 'All Levels') ? 'selected' : '' %>>All Levels</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="duration" class="form-label">Duration <span class="required">*</span></label>
+                <input
+                  type="text"
+                  id="duration"
+                  name="duration"
+                  class="form-input"
+                  value="<%= course ? course.duration : '' %>"
+                  placeholder="e.g. 2 Days"
+                  required
+                >
+              </div>
+
+              <div class="form-group">
+                <label for="display_order" class="form-label">Display Order</label>
+                <input
+                  type="number"
+                  id="display_order"
+                  name="display_order"
+                  class="form-input"
+                  value="<%= course ? course.display_order : 0 %>"
+                  min="0"
+                  step="1"
+                >
+              </div>
+
+              <div class="form-group form-group-checkbox">
+                <label class="checkbox-label">
+                  <input
+                    type="checkbox"
+                    name="is_active"
+                    value="1"
+                    class="form-checkbox"
+                    <%= (course && course.is_active) ? 'checked' : (!course ? 'checked' : '') %>
+                  >
+                  <span class="checkbox-text">Active (visible on site)</span>
+                </label>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: Descriptions -->
+        <div class="form-card">
+          <div class="form-card-header">
+            <h3 class="form-card-title">
+              <i class="fas fa-align-left"></i>
+              Descriptions
+            </h3>
+          </div>
+          <div class="form-card-body">
+
+            <div class="form-group">
+              <label for="short_description" class="form-label">Short Description</label>
+              <textarea
+                id="short_description"
+                name="short_description"
+                class="form-textarea"
+                rows="3"
+                placeholder="Brief summary shown in course listings..."
+              ><%= course ? course.short_description : '' %></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="full_description" class="form-label">Full Description</label>
+              <textarea
+                id="full_description"
+                name="full_description"
+                class="form-textarea form-textarea-tall"
+                rows="8"
+                placeholder="Detailed course description shown on the course page..."
+              ><%= course ? course.full_description : '' %></textarea>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Section 3: Course Details -->
+        <div class="form-card">
+          <div class="form-card-header">
+            <h3 class="form-card-title">
+              <i class="fas fa-clipboard-list"></i>
+              Course Details
+            </h3>
+          </div>
+          <div class="form-card-body">
+
+            <div class="form-group">
+              <label for="who_should_attend" class="form-label">Who Should Attend</label>
+              <textarea
+                id="who_should_attend"
+                name="who_should_attend"
+                class="form-textarea"
+                rows="5"
+                placeholder="Enter one item per line or as JSON array..."
+              ><%= course ? course.who_should_attend : '' %></textarea>
+              <span class="form-hint">Enter one audience type per line. This will be stored as a JSON array.</span>
+            </div>
+
+            <div class="form-group">
+              <label for="learning_objectives" class="form-label">Learning Objectives</label>
+              <textarea
+                id="learning_objectives"
+                name="learning_objectives"
+                class="form-textarea"
+                rows="5"
+                placeholder="What participants will learn..."
+              ><%= course ? course.learning_objectives : '' %></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="prerequisites" class="form-label">Prerequisites</label>
+              <textarea
+                id="prerequisites"
+                name="prerequisites"
+                class="form-textarea"
+                rows="4"
+                placeholder="Required knowledge or experience..."
+              ><%= course ? course.prerequisites : '' %></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="certification_info" class="form-label">Certification Info</label>
+              <textarea
+                id="certification_info"
+                name="certification_info"
+                class="form-textarea"
+                rows="4"
+                placeholder="Details about certification, exams, or credentials earned..."
+              ><%= course ? course.certification_info : '' %></textarea>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Section 4: Pricing (disabled) -->
+        <div class="form-card form-card-disabled">
+          <div class="form-card-header">
+            <h3 class="form-card-title">
+              <i class="fas fa-tag"></i>
+              Pricing
+              <span class="coming-soon-badge">Coming Soon</span>
+            </h3>
+          </div>
+          <div class="form-card-body">
+            <div class="form-group">
+              <label for="price" class="form-label">Price (USD)</label>
+              <input
+                type="number"
+                id="price"
+                name="price"
+                class="form-input"
+                value="<%= course ? course.price : '' %>"
+                placeholder="0.00"
+                step="0.01"
+                min="0"
+                disabled
+              >
+              <span class="form-hint form-hint-warning">
+                <i class="fas fa-info-circle"></i>
+                Payment integration coming soon. This field is currently disabled.
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i>
+            Save Changes
+          </button>
+          <a href="/admin/courses" class="btn btn-secondary">
+            <i class="fas fa-times"></i>
+            Cancel
+          </a>
+
+          <% if (!isNew && course) { %>
+            <div class="form-actions-right">
+              <button
+                type="button"
+                class="btn btn-danger"
+                data-confirm="Are you sure you want to deactivate this course? It will no longer appear on the site."
+                data-action="/admin/courses/<%= course.id %>"
+                data-method="DELETE"
+              >
+                <i class="fas fa-ban"></i>
+                Deactivate Course
+              </button>
+            </div>
+          <% } %>
+        </div>
+
+      </form>
+
+    </div><!-- /.admin-content -->
+  </div><!-- /.admin-main -->
+</div><!-- /.admin-wrapper -->
+
+<%- include('../partials/scripts') %>
