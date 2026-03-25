@@ -98,3 +98,39 @@
 </div><!-- /.admin-wrapper -->
 
 <%- include('../partials/scripts') %>
+
+<script>
+(function () {
+  // ── Toggle Active / Deactivate ─────────────────────────────────────────────
+  document.querySelectorAll('[data-toggle-active]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var id = btn.getAttribute('data-course-id');
+      var isActive = btn.title === 'Deactivate';
+      var label = isActive ? 'Deactivating…' : 'Activating…';
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + label;
+
+      fetch('/admin/api/courses/' + id + '/toggle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.success) {
+            // Reload page to reflect new state
+            window.location.reload();
+          } else {
+            alert('Failed to update course status.');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-toggle-off"></i> ' + (isActive ? 'Deactivate' : 'Activate');
+          }
+        })
+        .catch(function () {
+          alert('Network error. Please try again.');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-toggle-off"></i> ' + (isActive ? 'Deactivate' : 'Activate');
+        });
+    });
+  });
+})();
+</script>

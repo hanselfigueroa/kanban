@@ -45,7 +45,7 @@
         <div
           class="curriculum-list"
           data-sortable
-          data-reorder-url="/api/admin/curriculum/reorder"
+          data-reorder-url="/admin/api/curriculum/reorder"
         >
           <% modules.forEach(function(module) { %>
             <div class="curriculum-card" data-module-id="<%= module.id %>">
@@ -90,7 +90,7 @@
                     data-module-title="<%= module.module_title %>"
                     data-module-topics="<%= Array.isArray(module.topics) ? module.topics.join('\n') : (module.topics || '') %>"
                     data-module-duration="<%= module.duration || '' %>"
-                    data-edit-url="/admin/curriculum/<%= module.id %>"
+                    data-edit-url="/admin/api/curriculum/<%= module.id %>"
                   >
                     <i class="fas fa-pencil-alt"></i>
                     Edit
@@ -98,7 +98,7 @@
                   <button
                     type="button"
                     class="btn btn-sm btn-danger"
-                    data-delete-url="/api/admin/curriculum/<%= module.id %>"
+                    data-delete-url="/admin/api/curriculum/<%= module.id %>"
                     data-confirm="Delete this module?"
                   >
                     <i class="fas fa-trash"></i>
@@ -131,7 +131,7 @@
           <div class="form-card-body">
             <form
               id="moduleForm"
-              action="/admin/courses/<%= course.id %>/curriculum"
+              action="/admin/courses/<%= course.course_id %>/curriculum"
               method="POST"
             >
               <input type="hidden" name="_method" id="moduleFormMethod" value="">
@@ -217,7 +217,7 @@
     var moduleFormSubmitLabel = document.getElementById('moduleFormSubmitLabel');
     var toggleBtn = document.getElementById('toggleAddModuleForm');
     var cancelBtn = document.getElementById('cancelModuleForm');
-    var baseAction = '/admin/courses/<%= course.id %>/curriculum';
+    var baseAction = '/admin/courses/<%= course.course_id %>/curriculum';
 
     function showForm() {
       formSection.style.display = '';
