@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" fill="none">
+  <!-- Column 1: light lavender -->
+  <rect x="8" y="12" width="66" height="216" rx="18" fill="#ede8f9" stroke="#c0aaea" stroke-width="3"/>
+  <rect x="20" y="30" width="42" height="36" rx="10" fill="#bbaee0"/>
+  <rect x="20" y="76" width="42" height="36" rx="10" fill="#bbaee0"/>
+
+  <!-- Column 2: white/light with one purple card -->
+  <rect x="87" y="12" width="66" height="216" rx="18" fill="#f5f2fd" stroke="#c8b8ee" stroke-width="3"/>
+  <rect x="99" y="30" width="42" height="36" rx="10" fill="#9b74d4"/>
+
+  <!-- Column 3: solid purple -->
+  <rect x="166" y="12" width="66" height="216" rx="18" fill="#7c52d6"/>
+  <rect x="178" y="30" width="42" height="36" rx="10" fill="white" opacity="0.9"/>
+  <rect x="178" y="76" width="42" height="36" rx="10" fill="white" opacity="0.9"/>
+</svg>
