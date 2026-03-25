@@ -285,7 +285,7 @@
       btn.disabled = true;
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
 
-      fetch('/api/admin/content/' + key, {
+      fetch('/admin/api/content/' + key, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ value: input.value })
@@ -316,7 +316,7 @@
       var defaultVal = link.dataset.default || '';
       if (!confirm('Reset "' + key + '" to its default value? This cannot be undone.')) return;
 
-      fetch('/api/admin/content/' + key, {
+      fetch('/admin/api/content/' + key, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ value: defaultVal })

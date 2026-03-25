@@ -20,7 +20,7 @@ exports.showContent = async (req, res) => {
 exports.updateContent = async (req, res) => {
   try {
     const key = xss(req.params.key);
-    const content = xss(req.body.content || '');
+    const content = xss(req.body.value || req.body.content || '');
     await PageContent.upsert(key, content, req.session.adminId);
     res.json({ success: true, message: 'Content saved.' });
   } catch (err) {
