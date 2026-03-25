@@ -6,7 +6,16 @@
   <div class="hero-bg"></div>
   <div class="container hero-content">
     <span class="hero-badge">Kanban University Accredited</span>
-    <h1 class="hero-title"><%- (content && content.hero_headline) ? content.hero_headline.replace(/\*\*(.*?)\*\*/g, '<span class="text-gradient">$1</span>') : 'Master the Art of <span class="text-gradient">Continuous Flow</span>' %></h1>
+    <%
+      var _raw = (content && content.hero_headline) ? content.hero_headline : 'Master the Art of **Continuous Flow**';
+      var _hl  = _raw.replace(/\*\*(.*?)\*\*/g, '<span class="text-gradient">$1</span>');
+      // If no **markdown** found, auto-gradient the last two words
+      if (_hl === _raw) {
+        var _idx = _raw.lastIndexOf(' ', _raw.lastIndexOf(' ') - 1);
+        if (_idx > 0) _hl = _raw.substring(0, _idx + 1) + '<span class="text-gradient">' + _raw.substring(_idx + 1) + '</span>';
+      }
+    %>
+    <h1 class="hero-title"><%- _hl %></h1>
     <p class="hero-subtitle"><%= (content && content.hero_subheadline) || 'Transform your chaotic workload into an architectural stream of productivity. Join professionals mastering the Kanban methodology at the highest level.' %></p>
     <div class="hero-cta">
       <a href="#courses" class="btn btn-primary btn-lg">Start Learning Now <i class="fas fa-arrow-right"></i></a>
