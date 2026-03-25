@@ -19,6 +19,7 @@
   --admin-warning:      #f59e0b;
   --admin-info:         #3b82f6;
 
+  --admin-surface:       #1a1a1a;
   --admin-sidebar-width: 240px;
   --admin-topbar-height: 60px;
   --admin-radius:        8px;
@@ -55,7 +56,8 @@ a:hover {
 }
 
 /* ── Layout ──────────────────────────────────────────────────── */
-.admin-layout {
+.admin-layout,
+.admin-wrapper {
   display: flex;
   min-height: 100vh;
 }
