@@ -4,13 +4,18 @@ const Testimonial = {
   async getAll({ includeInactive = false } = {}) {
     const where = includeInactive ? '' : 'WHERE is_active = true';
     const result = await pool.query(
-      `SELECT * FROM testimonials ${where} ORDER BY display_order ASC, id ASC`
+      `SELECT *, client_name AS name, client_title AS role, client_company AS company, testimonial_text AS quote
+       FROM testimonials ${where} ORDER BY display_order ASC, id ASC`
     );
     return result.rows;
   },
 
   async getById(id) {
-    const result = await pool.query('SELECT * FROM testimonials WHERE id = $1', [id]);
+    const result = await pool.query(
+      `SELECT *, client_name AS name, client_title AS role, client_company AS company, testimonial_text AS quote
+       FROM testimonials WHERE id = $1`,
+      [id]
+    );
     return result.rows[0] || null;
   },
 
