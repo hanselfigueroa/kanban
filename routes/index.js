@@ -50,12 +50,6 @@ router.get('/about', async (req, res) => {
   });
 });
 
-router.get('/debug-dates', async (req, res) => {
-  const { pool } = require('../config/database');
-  const r1 = await pool.query('SELECT id, course_id, start_date, status, is_active FROM course_dates');
-  const r2 = await pool.query("SELECT id, course_id, start_date, status, is_active FROM course_dates WHERE course_id = 'tkp' AND start_date >= CURRENT_DATE AND status = 'upcoming' AND is_active = true");
-  res.json({ all: r1.rows, filtered: r2.rows });
-});
 
 router.get('/contact', (req, res) => {
   res.render('contact', {
