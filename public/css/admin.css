@@ -1787,3 +1787,152 @@ a:hover {
 .dates-list__spots  { font-size: 0.75rem; color: var(--admin-text-muted); display: flex; align-items: center; gap: 0.25rem; }
 
 .empty-state { color: var(--admin-text-muted); font-size: 0.875rem; text-align: center; padding: 1.5rem 0; }
+
+/* ── Sidebar nav class aliases (view uses these names) ─────────────────────── */
+
+.sidebar-logo {
+  padding: 1.5rem 1.25rem 1rem;
+  border-bottom: 1px solid var(--admin-border);
+  flex-shrink: 0;
+}
+.logo-link {
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: var(--admin-text) !important;
+  text-decoration: none;
+  display: block;
+}
+.logo-highlight { color: var(--admin-purple-light); }
+.sidebar-label {
+  display: block;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  color: var(--admin-text-muted);
+  text-transform: uppercase;
+  margin-top: 0.2rem;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 1rem 0;
+  overflow-y: auto;
+}
+
+.nav-group {
+  margin-bottom: 0.5rem;
+}
+.nav-group-label {
+  display: block;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--admin-text-muted);
+  padding: 0.75rem 1.25rem 0.25rem;
+}
+.nav-group-bottom {
+  margin-top: auto;
+  border-top: 1px solid var(--admin-border);
+  padding-top: 0.5rem;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1.25rem;
+  color: var(--admin-text-muted);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-left: 3px solid transparent;
+  transition: color var(--admin-transition), background var(--admin-transition), border-color var(--admin-transition);
+}
+.nav-item:hover {
+  color: var(--admin-text);
+  background: rgba(139, 92, 246, 0.08);
+  border-left-color: rgba(139, 92, 246, 0.4);
+}
+.nav-item.active {
+  color: var(--admin-purple-light);
+  background: rgba(109, 40, 217, 0.15);
+  border-left-color: var(--admin-purple);
+  font-weight: 600;
+}
+.nav-item-logout {
+  color: var(--admin-danger) !important;
+}
+.nav-item-logout:hover {
+  background: rgba(239, 68, 68, 0.1) !important;
+  border-left-color: var(--admin-danger) !important;
+}
+.sidebar-close-btn {
+  display: none;
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: var(--admin-text-muted);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+/* ── Topbar class aliases ──────────────────────────────────────────────────── */
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.topbar-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--admin-text);
+}
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.topbar-welcome {
+  font-size: 0.8rem;
+  color: var(--admin-text-muted);
+}
+.topbar-link {
+  font-size: 0.8rem;
+  color: var(--admin-text-muted);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.topbar-link:hover { color: var(--admin-text); }
+.topbar-logout-btn {
+  font-size: 0.8rem;
+  color: var(--admin-danger);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 4px;
+  transition: background var(--admin-transition);
+}
+.topbar-logout-btn:hover { background: rgba(239,68,68,0.1); color: var(--admin-danger); }
+.hamburger-btn {
+  background: none;
+  border: none;
+  color: var(--admin-text-muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0.4rem;
+  display: none;
+}
+@media (max-width: 768px) {
+  .hamburger-btn { display: flex; }
+  .sidebar-close-btn { display: block; }
+}
