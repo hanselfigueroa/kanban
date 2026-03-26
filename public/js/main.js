@@ -191,6 +191,11 @@ async function handleFormSubmit(e, form, url) {
     const result = await res.json();
 
     if (result.success) {
+      if (result.checkout_url) {
+        showToast(result.message, 'success');
+        setTimeout(function() { window.location.href = result.checkout_url; }, 800);
+        return;
+      }
       showToast(result.message, 'success');
       form.reset();
     } else {

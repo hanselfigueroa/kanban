@@ -1,0 +1,74 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+<section class="checkout-page">
+  <div class="checkout-container">
+    <div class="checkout-success">
+      <div class="checkout-success-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <h1>Order Confirmed!</h1>
+      <p class="checkout-order-number">Order #<%= order.order_number %></p>
+
+      <% if (successMessage) { %>
+        <p class="checkout-success-msg"><%= successMessage %></p>
+      <% } %>
+
+      <div class="checkout-card checkout-receipt">
+        <div class="checkout-card-header">
+          <h2>Receipt</h2>
+        </div>
+        <div class="checkout-card-body">
+          <div class="receipt-row">
+            <span>Course</span>
+            <span><%= course ? course.name : order.course_id %></span>
+          </div>
+          <div class="receipt-row">
+            <span>Participant</span>
+            <span><%= order.customer_name %></span>
+          </div>
+          <div class="receipt-row">
+            <span>Email</span>
+            <span><%= order.customer_email %></span>
+          </div>
+          <div class="order-divider"></div>
+          <div class="receipt-row">
+            <span>Subtotal</span>
+            <span><%= order.currency %> <%= parseFloat(order.subtotal).toFixed(2) %></span>
+          </div>
+          <% if (parseFloat(order.tax_amount) > 0) { %>
+            <div class="receipt-row">
+              <span>Tax</span>
+              <span><%= order.currency %> <%= parseFloat(order.tax_amount).toFixed(2) %></span>
+            </div>
+          <% } %>
+          <div class="receipt-row receipt-total">
+            <span>Total</span>
+            <span><%= order.currency %> <%= parseFloat(order.total).toFixed(2) %></span>
+          </div>
+          <div class="receipt-row">
+            <span>Status</span>
+            <span class="status-badge status-<%= order.payment_status %>"><%= order.payment_status %></span>
+          </div>
+          <% if (order.paid_at) { %>
+            <div class="receipt-row">
+              <span>Paid</span>
+              <span><%= new Date(order.paid_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></span>
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="checkout-disabled-actions">
+        <a href="/courses" class="btn-checkout-outline">
+          <i class="fas fa-book-open"></i> View More Courses
+        </a>
+        <a href="/" class="btn-checkout">
+          <i class="fas fa-home"></i> Back to Home
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>

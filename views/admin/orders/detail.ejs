@@ -1,0 +1,121 @@
+<%- include('../partials/head', { title: 'Order ' + order.order_number + ' - Kanban.UNO Admin' }) %>
+</head>
+<body class="admin-body">
+<div class="admin-wrapper">
+
+  <%- include('../partials/sidebar') %>
+
+  <div class="admin-main">
+    <%- include('../partials/topbar', { pageTitle: 'Order ' + order.order_number }) %>
+
+    <div class="admin-content">
+
+      <div class="breadcrumb">
+        <a href="/admin/orders" class="breadcrumb-link">Orders</a>
+        <i class="fas fa-chevron-right breadcrumb-sep"></i>
+        <span class="breadcrumb-current"><%= order.order_number %></span>
+      </div>
+
+      <div class="form-grid form-grid-2">
+
+        <!-- Order Info -->
+        <div class="content-card">
+          <div class="content-card-header">
+            <h3><i class="fas fa-receipt"></i> Order Details</h3>
+          </div>
+          <div class="content-card-body">
+            <div class="detail-row"><span>Order #</span><code><%= order.order_number %></code></div>
+            <div class="detail-row"><span>Status</span>
+              <span class="badge badge-<%= order.payment_status === 'paid' ? 'success' : (order.payment_status === 'failed' ? 'danger' : 'warning') %>">
+                <%= order.payment_status %>
+              </span>
+            </div>
+            <div class="detail-row"><span>Created</span><span><%= new Date(order.created_at).toLocaleString() %></span></div>
+            <% if (order.paid_at) { %>
+              <div class="detail-row"><span>Paid</span><span><%= new Date(order.paid_at).toLocaleString() %></span></div>
+            <% } %>
+            <div class="detail-row"><span>Course</span><span><%= order.course_id %></span></div>
+            <% if (order.payment_method) { %>
+              <div class="detail-row"><span>Method</span><span><%= order.payment_method %></span></div>
+            <% } %>
+            <% if (order.paggo_transaction_id) { %>
+              <div class="detail-row"><span>Paggo ID</span><code><%= order.paggo_transaction_id %></code></div>
+            <% } %>
+            <% if (order.payment_reference) { %>
+              <div class="detail-row"><span>Reference</span><span><%= order.payment_reference %></span></div>
+            <% } %>
+          </div>
+        </div>
+
+        <!-- Customer Info -->
+        <div class="content-card">
+          <div class="content-card-header">
+            <h3><i class="fas fa-user"></i> Customer</h3>
+          </div>
+          <div class="content-card-body">
+            <div class="detail-row"><span>Name</span><span><%= order.customer_name %></span></div>
+            <div class="detail-row"><span>Email</span><span><%= order.customer_email %></span></div>
+            <% if (order.customer_phone) { %>
+              <div class="detail-row"><span>Phone</span><span><%= order.customer_phone %></span></div>
+            <% } %>
+            <% if (order.customer_company) { %>
+              <div class="detail-row"><span>Company</span><span><%= order.customer_company %></span></div>
+            <% } %>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Pricing -->
+      <div class="content-card">
+        <div class="content-card-header">
+          <h3><i class="fas fa-money-bill-wave"></i> Pricing</h3>
+        </div>
+        <div class="content-card-body">
+          <div class="detail-row"><span>Subtotal</span><span><%= order.currency %> <%= parseFloat(order.subtotal).toFixed(2) %></span></div>
+          <% if (parseFloat(order.tax_amount) > 0) { %>
+            <div class="detail-row"><span>Tax (<%= (parseFloat(order.tax_rate) * 100).toFixed(0) %>%)</span><span><%= order.currency %> <%= parseFloat(order.tax_amount).toFixed(2) %></span></div>
+          <% } %>
+          <div class="detail-row" style="font-weight:700;font-size:1.1rem;"><span>Total</span><span><%= order.currency %> <%= parseFloat(order.total).toFixed(2) %></span></div>
+        </div>
+      </div>
+
+      <!-- Admin Actions -->
+      <div class="content-card">
+        <div class="content-card-header">
+          <h3><i class="fas fa-cog"></i> Admin Actions</h3>
+        </div>
+        <div class="content-card-body">
+          <form action="/admin/orders/<%= order.id %>" method="POST">
+            <div class="form-grid form-grid-2">
+              <div class="form-group">
+                <label for="payment_status" class="form-label">Update Payment Status</label>
+                <select name="payment_status" id="payment_status" class="form-select">
+                  <option value="pending" <%= order.payment_status === 'pending' ? 'selected' : '' %>>Pending</option>
+                  <option value="paid" <%= order.payment_status === 'paid' ? 'selected' : '' %>>Paid</option>
+                  <option value="failed" <%= order.payment_status === 'failed' ? 'selected' : '' %>>Failed</option>
+                  <option value="refunded" <%= order.payment_status === 'refunded' ? 'selected' : '' %>>Refunded</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="admin_notes" class="form-label">Admin Notes</label>
+                <textarea name="admin_notes" id="admin_notes" class="form-textarea" rows="3"><%= order.admin_notes || '' %></textarea>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Update Order
+              </button>
+              <a href="/admin/orders" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Orders
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/scripts') %>

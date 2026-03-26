@@ -1,0 +1,189 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+<section class="checkout-page">
+  <div class="checkout-container">
+
+    <div class="checkout-header">
+      <h1 class="checkout-title">Checkout</h1>
+      <p class="checkout-subtitle">Complete your enrollment for <strong><%= course ? course.name : 'Course' %></strong></p>
+    </div>
+
+    <div class="checkout-grid">
+
+      <!-- Left: Order Summary -->
+      <div class="checkout-summary">
+        <div class="checkout-card">
+          <div class="checkout-card-header">
+            <h2>Order Summary</h2>
+          </div>
+          <div class="checkout-card-body">
+
+            <div class="order-item">
+              <div class="order-item-info">
+                <span class="order-item-badge"><%= course ? course.acronym : '' %></span>
+                <div>
+                  <h3 class="order-item-name"><%= course ? course.name : 'Course' %></h3>
+                  <% if (courseDate) { %>
+                    <p class="order-item-date">
+                      <i class="fas fa-calendar-alt"></i>
+                      <%= new Date(courseDate.start_date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
+                    </p>
+                    <% if (courseDate.format) { %>
+                      <p class="order-item-format">
+                        <i class="fas fa-<%= courseDate.format.toLowerCase().includes('virtual') ? 'video' : 'building' %>"></i>
+                        <%= courseDate.format %><%= courseDate.location ? ' - ' + courseDate.location : '' %>
+                      </p>
+                    <% } %>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+
+            <div class="order-divider"></div>
+
+            <div class="order-participant">
+              <h4>Participant</h4>
+              <p><strong><%= registration.full_name %></strong></p>
+              <p><%= registration.email %></p>
+              <% if (registration.company) { %>
+                <p><%= registration.company %></p>
+              <% } %>
+            </div>
+
+            <div class="order-divider"></div>
+
+            <div class="order-pricing">
+              <div class="price-row">
+                <span>Subtotal</span>
+                <span><%= pricing.currency %> <%= pricing.subtotal.toFixed(2) %></span>
+              </div>
+              <% if (pricing.taxRate > 0) { %>
+                <div class="price-row">
+                  <span>IVA (<%= (pricing.taxRate * 100).toFixed(0) %>%)</span>
+                  <span><%= pricing.currency %> <%= pricing.taxAmount.toFixed(2) %></span>
+                </div>
+              <% } %>
+              <div class="price-row price-total">
+                <span>Total</span>
+                <span><%= pricing.currency %> <%= pricing.total.toFixed(2) %></span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Payment -->
+      <div class="checkout-payment">
+        <div class="checkout-card">
+          <div class="checkout-card-header">
+            <h2>Payment</h2>
+          </div>
+          <div class="checkout-card-body">
+
+            <div id="payment-section">
+              <% if (pricing.total <= 0) { %>
+                <div class="checkout-notice">
+                  <i class="fas fa-info-circle"></i>
+                  <p>No payment is required. Click below to confirm your enrollment.</p>
+                </div>
+                <button type="button" class="btn-checkout" id="btnConfirmFree" data-registration-id="<%= registration.id %>">
+                  <i class="fas fa-check-circle"></i>
+                  Confirm Enrollment
+                </button>
+              <% } else { %>
+                <!-- Paggo payment integration will go here -->
+                <div class="checkout-notice checkout-notice-info">
+                  <i class="fas fa-credit-card"></i>
+                  <div>
+                    <p><strong>Online payment</strong></p>
+                    <p>Click the button below to proceed with your payment of <strong><%= pricing.currency %> <%= pricing.total.toFixed(2) %></strong>.</p>
+                  </div>
+                </div>
+
+                <button type="button" class="btn-checkout" id="btnPay" data-registration-id="<%= registration.id %>">
+                  <i class="fas fa-lock"></i>
+                  Pay <%= pricing.currency %> <%= pricing.total.toFixed(2) %>
+                </button>
+
+                <div id="payment-processing" style="display:none;" class="checkout-processing">
+                  <div class="spinner"></div>
+                  <p>Processing your payment...</p>
+                </div>
+
+                <div id="payment-result" style="display:none;"></div>
+              <% } %>
+            </div>
+
+            <% if (settings.checkout_terms) { %>
+              <div class="checkout-terms">
+                <p><%= settings.checkout_terms %></p>
+              </div>
+            <% } %>
+
+          </div>
+        </div>
+
+        <a href="/courses/<%= registration.course_selected %>" class="checkout-back">
+          <i class="fas fa-arrow-left"></i> Back to course
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  var payBtn = document.getElementById('btnPay') || document.getElementById('btnConfirmFree');
+  if (!payBtn) return;
+
+  payBtn.addEventListener('click', function () {
+    var regId = payBtn.getAttribute('data-registration-id');
+    payBtn.style.display = 'none';
+    var processing = document.getElementById('payment-processing');
+    if (processing) processing.style.display = 'flex';
+
+    fetch('/checkout/' + regId + '/pay', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.success) {
+          if (data.payment_url) {
+            // Redirect to Paggo payment page
+            window.location.href = data.payment_url;
+          } else {
+            // No payment URL yet (Paggo not integrated) — show order created
+            var result = document.getElementById('payment-result');
+            if (processing) processing.style.display = 'none';
+            if (result) {
+              result.style.display = 'block';
+              result.innerHTML =
+                '<div class="checkout-notice checkout-notice-success">' +
+                '<i class="fas fa-check-circle"></i>' +
+                '<div>' +
+                '<p><strong>Order Created: ' + data.order.order_number + '</strong></p>' +
+                '<p>' + data.message + '</p>' +
+                '<p>Our team will contact you with payment instructions shortly.</p>' +
+                '</div></div>';
+            }
+          }
+        } else {
+          if (processing) processing.style.display = 'none';
+          payBtn.style.display = '';
+          alert('Error: ' + (data.error || 'Payment failed'));
+        }
+      })
+      .catch(function () {
+        if (processing) processing.style.display = 'none';
+        payBtn.style.display = '';
+        alert('Network error. Please try again.');
+      });
+  });
+})();
+</script>
+
+<%- include('../partials/footer') %>

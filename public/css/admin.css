@@ -2201,3 +2201,63 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 .curriculum-actions { display: flex; gap: 8px; }
 
 .inline-form-section { margin-top: 24px; }
+
+/* ── Settings & Order detail ─────────────────────────────────── */
+.toggle-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+}
+.toggle-label .form-checkbox { margin-top: 4px; }
+.toggle-text { display: flex; flex-direction: column; gap: 2px; }
+.toggle-text strong { color: var(--admin-text); font-size: .95rem; }
+.toggle-text small { color: var(--admin-text-dim); font-size: .78rem; }
+
+.checkout-api-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: rgba(59,130,246,.08);
+  border: 1px solid rgba(59,130,246,.15);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-top: 12px;
+  font-size: .8rem;
+  color: var(--admin-text-dim);
+}
+.checkout-api-hint i { color: var(--admin-info); margin-top: 2px; }
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--admin-border);
+  font-size: .88rem;
+}
+.detail-row:last-child { border-bottom: 0; }
+.detail-row > span:first-child { color: var(--admin-text-dim); }
+.detail-row > span:last-child,
+.detail-row > code { color: var(--admin-text); font-weight: 500; }
+
+.filter-bar-form {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.filter-bar-form .form-input,
+.filter-bar-form .form-select { flex: 1; min-width: 140px; }
+
+.alert {
+  padding: 14px 18px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: .88rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.alert-success { background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.2); color: var(--admin-success); }
+.alert-danger { background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.2); color: var(--admin-danger); }

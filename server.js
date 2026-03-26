@@ -11,6 +11,7 @@ const indexRoutes        = require('./routes/index');
 const courseRoutes       = require('./routes/courses');
 const registrationRoutes = require('./routes/registration');
 const adminRoutes        = require('./routes/admin');
+const checkoutRoutes     = require('./routes/checkout');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -70,7 +71,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.use('/',        indexRoutes);
 app.use('/courses', courseRoutes);
 app.use('/api',     registrationRoutes);
-app.use('/admin',   adminRoutes);
+app.use('/admin',    adminRoutes);
+app.use('/checkout', checkoutRoutes);
 
 // ── Error pages ──────────────────────────────────────────────────────────────
 app.use((req, res) => {

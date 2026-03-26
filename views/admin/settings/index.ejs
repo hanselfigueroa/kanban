@@ -1,0 +1,129 @@
+<%- include('../partials/head', { title: 'Checkout Settings - Kanban.UNO Admin' }) %>
+</head>
+<body class="admin-body">
+<div class="admin-wrapper">
+
+  <%- include('../partials/sidebar') %>
+
+  <div class="admin-main">
+    <%- include('../partials/topbar', { pageTitle: 'Checkout Settings' }) %>
+
+    <div class="admin-content">
+
+      <% if (success) { %>
+        <div class="alert alert-success"><i class="fas fa-check-circle"></i> Settings saved successfully.</div>
+      <% } %>
+      <% if (error) { %>
+        <div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> Failed to save settings.</div>
+      <% } %>
+
+      <form action="/admin/settings" method="POST">
+
+        <!-- Checkout Toggle -->
+        <div class="content-card">
+          <div class="content-card-header">
+            <h3><i class="fas fa-toggle-on"></i> Checkout Status</h3>
+          </div>
+          <div class="content-card-body">
+            <div class="form-group">
+              <label class="toggle-label">
+                <input type="checkbox" name="checkout_enabled" class="form-checkbox"
+                  <%= settings.checkout_enabled === 'true' ? 'checked' : '' %>>
+                <span class="toggle-text">
+                  <strong>Enable Online Checkout</strong>
+                  <small>When enabled, a checkout/payment step is added after registration</small>
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pricing Settings -->
+        <div class="content-card">
+          <div class="content-card-header">
+            <h3><i class="fas fa-money-bill-wave"></i> Pricing</h3>
+          </div>
+          <div class="content-card-body">
+            <div class="form-grid form-grid-2">
+              <div class="form-group">
+                <label for="checkout_currency" class="form-label">Currency</label>
+                <select name="checkout_currency" id="checkout_currency" class="form-select">
+                  <option value="GTQ" <%= settings.checkout_currency === 'GTQ' ? 'selected' : '' %>>GTQ - Quetzal</option>
+                  <option value="USD" <%= settings.checkout_currency === 'USD' ? 'selected' : '' %>>USD - US Dollar</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="checkout_tax_rate" class="form-label">Tax Rate (IVA)</label>
+                <input type="text" name="checkout_tax_rate" id="checkout_tax_rate" class="form-input"
+                  value="<%= settings.checkout_tax_rate || '0.12' %>"
+                  placeholder="0.12 = 12%">
+                <span class="form-hint">Enter as decimal, e.g. 0.12 for 12% IVA</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paggo API Settings -->
+        <div class="content-card">
+          <div class="content-card-header">
+            <h3><i class="fas fa-credit-card"></i> Paggo API Configuration</h3>
+          </div>
+          <div class="content-card-body">
+            <div class="form-group">
+              <label for="paggo_api_url" class="form-label">Paggo API URL</label>
+              <input type="text" name="paggo_api_url" id="paggo_api_url" class="form-input"
+                value="<%= settings.paggo_api_url || '' %>"
+                placeholder="https://api.paggo.com/v1">
+            </div>
+            <div class="form-grid form-grid-2">
+              <div class="form-group">
+                <label for="paggo_api_key" class="form-label">API Key</label>
+                <input type="password" name="paggo_api_key" id="paggo_api_key" class="form-input"
+                  value="<%= settings.paggo_api_key || '' %>"
+                  placeholder="sk_live_...">
+              </div>
+              <div class="form-group">
+                <label for="paggo_merchant_id" class="form-label">Merchant ID</label>
+                <input type="text" name="paggo_merchant_id" id="paggo_merchant_id" class="form-input"
+                  value="<%= settings.paggo_merchant_id || '' %>"
+                  placeholder="Your Paggo merchant ID">
+              </div>
+            </div>
+            <div class="checkout-api-hint">
+              <i class="fas fa-info-circle"></i>
+              Leave these fields empty until you have your Paggo credentials. Orders will be created but payment will need to be confirmed manually.
+            </div>
+          </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="content-card">
+          <div class="content-card-header">
+            <h3><i class="fas fa-comment-alt"></i> Messages</h3>
+          </div>
+          <div class="content-card-body">
+            <div class="form-group">
+              <label for="checkout_success_message" class="form-label">Success Message</label>
+              <textarea name="checkout_success_message" id="checkout_success_message" class="form-textarea" rows="3"><%= settings.checkout_success_message || '' %></textarea>
+            </div>
+            <div class="form-group">
+              <label for="checkout_terms" class="form-label">Terms & Conditions</label>
+              <textarea name="checkout_terms" id="checkout_terms" class="form-textarea" rows="4"><%= settings.checkout_terms || '' %></textarea>
+              <span class="form-hint">Shown on the checkout page before payment</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Save Settings
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/scripts') %>

@@ -7,7 +7,7 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "build": "echo 'No build step required'",
-    "migrate": "node migrations/001_admin_tables.js",
+    "migrate": "node migrations/001_admin_tables.js && node migrations/002_checkout_tables.js",
     "create-admin": "node scripts/create-admin.js"
   },
   "dependencies": {

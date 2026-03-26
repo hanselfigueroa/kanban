@@ -11,6 +11,8 @@ const datesCtrl        = require('../controllers/admin/datesController');
 const regsCtrl         = require('../controllers/admin/registrationsController');
 const contentCtrl      = require('../controllers/admin/contentController');
 const testimonialsCtrl = require('../controllers/admin/testimonialsController');
+const settingsCtrl     = require('../controllers/admin/settingsController');
+const ordersCtrl       = require('../controllers/admin/ordersController');
 
 // Rate limit login attempts (5 per 15 min per IP)
 const loginLimiter = rateLimit({
@@ -64,6 +66,15 @@ router.get('/testimonials',               testimonialsCtrl.listTestimonials);
 router.post('/testimonials',              testimonialsCtrl.createTestimonial);
 router.post('/testimonials/:id',          testimonialsCtrl.updateTestimonial);
 router.post('/testimonials/:id/delete',   testimonialsCtrl.deleteTestimonial);
+
+// ── Orders ──────────────────────────────────────────────────────────────────
+router.get('/orders',                     ordersCtrl.listOrders);
+router.get('/orders/:id',                 ordersCtrl.showOrder);
+router.post('/orders/:id',                ordersCtrl.updateOrder);
+
+// ── Settings ────────────────────────────────────────────────────────────────
+router.get('/settings',                   settingsCtrl.showSettings);
+router.post('/settings',                  settingsCtrl.updateSettings);
 
 // ── API Endpoints (JSON) ─────────────────────────────────────────────────────
 // Courses

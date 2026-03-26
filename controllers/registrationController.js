@@ -107,9 +107,24 @@ async function createRegistration(req, res) {
       // Registration still succeeds even if email fails
     }
 
+    // Check if checkout is enabled — redirect to payment if so
+    let checkoutUrl = null;
+    try {
+      const SiteSettings = require('../models/siteSettings');
+      const checkoutEnabled = await SiteSettings.isCheckoutEnabled();
+      if (checkoutEnabled) {
+        checkoutUrl = `/checkout/${registration.id}`;
+      }
+    } catch (e) {
+      // If settings table doesn't exist yet, skip checkout
+    }
+
     return res.status(201).json({
       success: true,
-      message: 'Registration received! We\'ll be in touch soon.'
+      message: checkoutUrl
+        ? 'Registration received! Redirecting to checkout...'
+        : 'Registration received! We\'ll be in touch soon.',
+      checkout_url: checkoutUrl
     });
   } catch (err) {
     console.error('Registration error:', err);
