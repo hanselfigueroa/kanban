@@ -96,16 +96,11 @@ async function createRegistration(req, res) {
 
     const courseName = courses[course_selected].name;
 
-    // Send emails (non-blocking - don't fail the request if email fails)
-    try {
-      await Promise.all([
-        sendUserConfirmation(registration, courseName),
-        sendAdminNotification(registration, courseName)
-      ]);
-    } catch (emailErr) {
-      console.error('Email sending failed:', emailErr.message);
-      // Registration still succeeds even if email fails
-    }
+    // Fire emails truly non-blocking — do NOT await, respond immediately
+    Promise.all([
+      sendUserConfirmation(registration, courseName),
+      sendAdminNotification(registration, courseName)
+    ]).catch(emailErr => console.error('Email sending failed:', emailErr.message));
 
     // Check if checkout is enabled — redirect to payment if so
     let checkoutUrl = null;
