@@ -104,14 +104,14 @@
                     <%= r.created_at ? new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—' %>
                   </td>
                   <td>
-                    <span class="name-cell"><%= r.first_name || '' %> <%= r.last_name || '' %></span>
+                    <span class="name-cell"><%= r.full_name || '—' %></span>
                   </td>
                   <td>
                     <a href="mailto:<%= r.email %>" class="email-link"><%= r.email %></a>
                   </td>
                   <td><%= r.phone || '—' %></td>
                   <td>
-                    <span class="course-acronym"><%= r.course_acronym || r.course_id || '—' %></span>
+                    <span class="course-acronym"><%= r.acronym || r.course_selected || '—' %></span>
                   </td>
                   <td>
                     <%= r.preferred_date ? new Date(r.preferred_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—' %>
@@ -136,7 +136,7 @@
                       <button
                         type="button"
                         class="btn btn-sm btn-danger"
-                        data-delete-url="/api/admin/registrations/<%= r.id %>"
+                        data-delete-url="/admin/api/registrations/<%= r.id %>"
                         data-confirm="Delete this registration? This cannot be undone."
                         title="Delete"
                       >

@@ -34,7 +34,7 @@
                 <div class="detail-item">
                   <dt class="detail-label">Full Name</dt>
                   <dd class="detail-value">
-                    <%= registration.first_name || '' %> <%= registration.last_name || '' %>
+                    <%= registration.full_name || '—' %>
                   </dd>
                 </div>
 
@@ -68,11 +68,11 @@
                 <div class="detail-item">
                   <dt class="detail-label">Course</dt>
                   <dd class="detail-value">
-                    <% if (course) { %>
-                      <span class="course-acronym"><%= course.acronym %></span>
-                      <span class="detail-course-name"><%= course.name %></span>
+                    <% if (registration.acronym) { %>
+                      <span class="course-acronym"><%= registration.acronym %></span>
+                      <span class="detail-course-name"><%= registration.course_name %></span>
                     <% } else { %>
-                      <span class="detail-empty"><%= registration.course_id || '—' %></span>
+                      <span class="detail-empty"><%= registration.course_selected || '—' %></span>
                     <% } %>
                   </dd>
                 </div>
@@ -159,7 +159,7 @@
 
               <div class="contact-actions">
                 <h4 class="contact-actions-title">Quick Contact</h4>
-                <a href="mailto:<%= registration.email %>?subject=<%= encodeURIComponent('Re: ' + (course ? course.name : 'Course') + ' Registration') %>" class="btn btn-secondary btn-full">
+                <a href="mailto:<%= registration.email %>?subject=<%= encodeURIComponent('Re: ' + (registration.course_name || 'Course') + ' Registration') %>" class="btn btn-secondary btn-full">
                   <i class="fas fa-envelope"></i>
                   Send Email
                 </a>
@@ -216,7 +216,7 @@
               <button
                 type="button"
                 class="btn btn-danger btn-full"
-                data-delete-url="/api/admin/registrations/<%= registration.id %>"
+                data-delete-url="/admin/api/registrations/<%= registration.id %>"
                 data-confirm="Permanently delete registration #<%= registration.id %>? This cannot be undone."
                 data-redirect="/admin/registrations"
               >
