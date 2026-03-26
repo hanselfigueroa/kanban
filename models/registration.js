@@ -2,13 +2,13 @@ const { pool } = require('../config/database');
 
 const Registration = {
   // Create a new registration
-  async create({ full_name, email, phone, company, course_selected, preferred_format, message }) {
+  async create({ full_name, email, phone, company, course_selected, course_date_id, preferred_format, message }) {
     const query = `
-      INSERT INTO registrations (full_name, email, phone, company, course_selected, preferred_format, message)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      INSERT INTO registrations (full_name, email, phone, company, course_selected, course_date_id, preferred_format, message)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *;
     `;
-    const values = [full_name, email, phone, company, course_selected, preferred_format, message];
+    const values = [full_name, email, phone, company, course_selected, course_date_id || null, preferred_format, message];
     const result = await pool.query(query, values);
     return result.rows[0];
   },

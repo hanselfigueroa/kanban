@@ -62,7 +62,7 @@ async function sendAdminNotification(registration, courseName) {
 // POST /api/register
 async function createRegistration(req, res) {
   try {
-    const { full_name, email, phone, company, course_selected, preferred_format, message } = req.body;
+    const { full_name, email, phone, company, course_selected, course_date_id, preferred_format, message } = req.body;
 
     // Validate required fields
     if (!full_name || !email || !course_selected) {
@@ -87,6 +87,7 @@ async function createRegistration(req, res) {
       phone: phone ? xss(phone.trim()) : null,
       company: company ? xss(company.trim()) : null,
       course_selected: xss(course_selected),
+      course_date_id: course_date_id ? parseInt(course_date_id, 10) || null : null,
       preferred_format: preferred_format ? xss(preferred_format) : null,
       message: message ? xss(message.trim()) : null
     };
