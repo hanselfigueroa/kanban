@@ -31,7 +31,7 @@ exports.listRegistrations = async (req, res) => {
     const [regsResult, countResult, courses] = await Promise.all([
       pool.query(
         `SELECT r.*, c.name as course_name, c.acronym,
-                cd.start_date as date_start, cd.format as date_format
+                cd.start_date as preferred_date, cd.format as date_format
          FROM registrations r
          LEFT JOIN courses c ON r.course_selected = c.course_id
          LEFT JOIN course_dates cd ON r.course_date_id = cd.id
@@ -66,7 +66,7 @@ exports.showRegistration = async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT r.*, c.name as course_name, c.acronym,
-              cd.start_date, cd.format as date_format, cd.location as date_location
+              cd.start_date as preferred_date, cd.format as date_format, cd.location as date_location
        FROM registrations r
        LEFT JOIN courses c ON r.course_selected = c.course_id
        LEFT JOIN course_dates cd ON r.course_date_id = cd.id
