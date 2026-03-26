@@ -143,11 +143,11 @@
                       <li class="dates-list__item">
                         <div class="dates-list__info">
                           <span class="dates-list__course">
-                            <%= d.course ? d.course.title : 'Untitled Course' %>
+                            <%= d.course_name || d.acronym || 'Untitled Course' %>
                           </span>
                           <span class="dates-list__date">
                             <i class="fas fa-calendar-alt"></i>
-                            <%= new Date(d.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) %>
+                            <%= new Date(d.start_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) %>
                           </span>
                           <div class="dates-list__meta">
                             <span class="format-badge format-badge--<%= d.format ? d.format.toLowerCase().replace(/\s+/g, '-') : 'online' %>">
@@ -155,12 +155,12 @@
                             </span>
                             <span class="dates-list__spots">
                               <i class="fas fa-user-friends"></i>
-                              <% const booked = d.bookedSpots || 0; const total = d.maxParticipants || 0; %>
-                              <%= booked %>/<%= total %> spots
+                              <% const booked = d.current_participants || 0; const total = d.max_participants || 0; %>
+                              <%= booked %>/<%= total || '∞' %> spots
                             </span>
                           </div>
                         </div>
-                        <a href="/admin/dates/<%= d._id %>/edit" class="btn-action btn-action--edit">
+                        <a href="/admin/dates/<%= d.id %>/edit" class="btn-action btn-action--edit">
                           <i class="fas fa-pencil-alt"></i>
                           Edit
                         </a>
