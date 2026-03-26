@@ -1982,14 +1982,14 @@ a:hover {
   text-transform: uppercase; letter-spacing: 0.08em;
   color: var(--admin-text-muted); margin-bottom: 0.4rem;
 }
-.form-control, .form-select {
+.form-control, .form-input, .form-select, .form-textarea {
   width: 100%; padding: 0.6rem 0.875rem;
   background: #0f0f0f; border: 1px solid var(--admin-border);
   border-radius: 6px; color: var(--admin-text); font-family: inherit;
   font-size: 0.875rem; transition: border-color 0.15s, box-shadow 0.15s;
   appearance: none;
 }
-.form-control:focus, .form-select:focus {
+.form-control:focus, .form-input:focus, .form-select:focus, .form-textarea:focus {
   outline: none; border-color: var(--admin-purple);
   box-shadow: 0 0 0 3px rgba(109,40,217,0.2);
 }

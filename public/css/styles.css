@@ -2201,3 +2201,18 @@ img {
 .status-pending { background: rgba(251,191,36,.15); color: #fbbf24; }
 .status-failed { background: rgba(239,68,68,.15); color: #f87171; }
 .status-refunded { background: rgba(99,102,241,.15); color: #818cf8; }
+
+/* ── Format pill (auto-detected format in registration form) ── */
+.format-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(109, 40, 217, 0.12);
+  border: 1px solid rgba(109, 40, 217, 0.3);
+  color: var(--accent-purple);
+  font-size: .85rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 8px;
+  width: 100%;
+}

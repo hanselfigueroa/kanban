@@ -95,7 +95,7 @@
                 </div>
                 <% } %>
               </div>
-              <button class="btn btn-primary btn-block btn-sm select-date-btn" data-date-id="<%= date.id %>">
+              <button class="btn btn-primary btn-block btn-sm select-date-btn" data-date-id="<%= date.id %>" data-format="<%= date.format || '' %>">
                 Select This Date
               </button>
             </div>
@@ -174,12 +174,12 @@
               <select id="preferred_date_select" name="preferred_date_select">
                 <option value="">Select a date (optional)</option>
                 <% upcomingDates.forEach(date => { %>
-                <option value="<%= date.id %>">
+                <option value="<%= date.id %>" data-format="<%= date.format || '' %>">
                   <%= new Date(date.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
                   — <%= date.format %>
                 </option>
                 <% }); %>
-                <option value="other">Other / Contact me</option>
+                <option value="other" data-format="">Other / Contact me</option>
               </select>
             </div>
             <% } %>
@@ -206,7 +206,8 @@
               <input type="text" id="company" name="company" placeholder="Your Company">
             </div>
 
-            <div class="form-group">
+            <!-- Format: auto-filled from date, shown only for Other/Contact me -->
+            <div class="form-group" id="formatGroup" style="display:none;">
               <label for="preferred_format">Preferred Format</label>
               <select id="preferred_format" name="preferred_format">
                 <option value="">Select format...</option>
@@ -214,6 +215,12 @@
                 <option value="virtual">Virtual / Online</option>
                 <option value="either">No Preference</option>
               </select>
+            </div>
+            <!-- Shows auto-detected format when a real date is selected -->
+            <div class="form-group" id="formatDisplay" style="display:none;">
+              <label>Format</label>
+              <div class="format-pill" id="formatPillText"></div>
+              <input type="hidden" id="preferred_format_hidden" name="preferred_format">
             </div>
 
             <div class="form-group">
@@ -262,23 +269,59 @@
 <%- include('partials/footer') %>
 
 <script>
-// Sync date card selection with hidden field + form select
-document.querySelectorAll('.select-date-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const dateId = btn.dataset.dateId;
+// ── Format field logic ────────────────────────────────────────────────────
+function updateFormatField(dateId, format) {
+  var formatGroup   = document.getElementById('formatGroup');
+  var formatDisplay = document.getElementById('formatDisplay');
+  var formatPill    = document.getElementById('formatPillText');
+  var formatHidden  = document.getElementById('preferred_format_hidden');
+  if (!formatGroup || !formatDisplay) return;
+
+  if (dateId && dateId !== 'other' && format) {
+    // Real date selected — show auto-detected format, hide dropdown
+    formatGroup.style.display   = 'none';
+    formatDisplay.style.display = '';
+    formatPill.textContent      = format;
+    if (formatHidden) formatHidden.value = format;
+  } else if (dateId === 'other' || !dateId) {
+    // "Other / Contact me" or nothing — let them choose
+    formatGroup.style.display   = '';
+    formatDisplay.style.display = 'none';
+    if (formatHidden) formatHidden.value = '';
+  } else {
+    // No date — hide both (no format needed)
+    formatGroup.style.display   = 'none';
+    formatDisplay.style.display = 'none';
+  }
+}
+
+// ── Date card buttons ─────────────────────────────────────────────────────
+document.querySelectorAll('.select-date-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var dateId = btn.dataset.dateId;
+    var format = btn.dataset.format || '';
     document.getElementById('selectedDateId').value = dateId;
-    const sel = document.getElementById('preferred_date_select');
-    if (sel) sel.value = dateId;
-    document.querySelectorAll('.date-card').forEach(c => c.classList.remove('selected'));
+    var sel = document.getElementById('preferred_date_select');
+    if (sel) {
+      sel.value = dateId;
+      updateFormatField(dateId, format);
+    }
+    document.querySelectorAll('.date-card').forEach(function(c) { c.classList.remove('selected'); });
     btn.closest('.date-card').classList.add('selected');
     btn.textContent = '✓ Selected';
     document.getElementById('registrationCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   });
 });
-const dateSelect = document.getElementById('preferred_date_select');
+
+// ── Date dropdown ─────────────────────────────────────────────────────────
+var dateSelect = document.getElementById('preferred_date_select');
 if (dateSelect) {
-  dateSelect.addEventListener('change', () => {
-    document.getElementById('selectedDateId').value = dateSelect.value;
+  dateSelect.addEventListener('change', function() {
+    var val    = dateSelect.value;
+    var opt    = dateSelect.options[dateSelect.selectedIndex];
+    var format = opt ? (opt.getAttribute('data-format') || '') : '';
+    document.getElementById('selectedDateId').value = val === 'other' ? '' : val;
+    updateFormatField(val, format);
   });
 }
 </script>
