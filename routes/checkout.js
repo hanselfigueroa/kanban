@@ -7,6 +7,7 @@ router.get('/success/:orderNumber', checkoutCtrl.showSuccess);
 router.post('/webhook/paggo', checkoutCtrl.paggoWebhook);
 
 // Public checkout pages — :courseId is the course_id string (e.g. 'tkp')
+router.get('/:courseId/start', checkoutCtrl.startCheckout);
 router.get('/:courseId', checkoutCtrl.showCheckout);
 router.post('/:courseId/pay', checkoutCtrl.processPayment);
 

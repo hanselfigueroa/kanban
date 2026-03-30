@@ -5,6 +5,97 @@ const CourseDb = require('../models/courseDb');
 const CourseDate = require('../models/courseDate');
 const Registration = require('../models/registration');
 
+// ── Direct-to-Paggo: create link and redirect immediately ──────────────────
+exports.startCheckout = async (req, res) => {
+  try {
+    const enabled = await SiteSettings.isCheckoutEnabled();
+    if (!enabled) return res.redirect('/courses');
+
+    const course = await CourseDb.getById(req.params.courseId);
+    if (!course) return res.redirect('/courses');
+
+    const course_date_id = req.query.date_id ? parseInt(req.query.date_id) || null : null;
+    const settings  = await SiteSettings.getCheckoutSettings();
+    const price     = parseFloat(course.price) || 0;
+    const taxRate   = parseFloat(settings.checkout_tax_rate) || 0;
+    const taxAmount = Math.round(price * taxRate * 100) / 100;
+    const total     = Math.round((price + taxAmount) * 100) / 100;
+
+    // Create order — customer info filled in later via Paggo webhook
+    const order = await Order.create({
+      registration_id: null,
+      course_id: course.course_id,
+      course_date_id,
+      customer_name: 'Pending',
+      customer_email: 'pending@pending.com',
+      subtotal: price,
+      tax_rate: taxRate,
+      tax_amount: taxAmount,
+      total,
+      currency: settings.checkout_currency || 'GTQ'
+    });
+
+    // Free course — confirm registration immediately, no payment needed
+    if (total <= 0) {
+      const registration = await Registration.create({
+        full_name: 'Customer',
+        email: 'pending@pending.com',
+        phone: null, company: null,
+        course_selected: course.course_id,
+        course_date_id: course_date_id || null,
+        preferred_format: null, message: null
+      });
+      await Registration.updateStatus(registration.id, 'confirmed');
+      await Order.updateRegistrationId(order.id, registration.id);
+      await Order.updatePaymentStatus(order.id, 'paid', { payment_method: 'free' });
+      return res.redirect(`/checkout/success/${order.order_number}`);
+    }
+
+    const apiKey = settings.paggo_api_key;
+    const apiUrl = (settings.paggo_api_url || 'https://api.paggoapp.com/api').replace(/\/$/, '');
+    if (!apiKey) return res.redirect(`/courses/${req.params.courseId}`);
+
+    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    const paggoRes = await fetch(`${apiUrl}/center/transactions/create-link`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-API-KEY': apiKey },
+      body: JSON.stringify({
+        concept: `${course.name} - ${order.order_number}`,
+        amount: total,
+        metadata: {
+          redirectUrl: `${baseUrl}/checkout/success/${order.order_number}`,
+          custom: { orderId: order.order_number }
+        }
+      })
+    });
+
+    const rawText = await paggoRes.text();
+    let paggoData;
+    try { paggoData = JSON.parse(rawText); } catch (e) {
+      console.error('[Paggo] non-JSON response:', rawText.substring(0, 300));
+      await Order.updatePaymentStatus(order.id, 'failed', {});
+      return res.redirect(`/courses/${req.params.courseId}?error=payment`);
+    }
+
+    if (!paggoRes.ok || !paggoData.result?.link) {
+      console.error('[Paggo] start error:', paggoData);
+      await Order.updatePaymentStatus(order.id, 'failed', { paggo_response: paggoData });
+      return res.redirect(`/courses/${req.params.courseId}?error=payment`);
+    }
+
+    await Order.updatePaymentStatus(order.id, 'pending', {
+      paggo_transaction_id: String(paggoData.result.id),
+      payment_method: 'paggo',
+      paggo_response: paggoData
+    });
+
+    return res.redirect(paggoData.result.link);
+  } catch (err) {
+    console.error('Start checkout error:', err);
+    res.redirect('/courses');
+  }
+};
+
 // ── Show checkout page ──────────────────────────────────────────────────────
 exports.showCheckout = async (req, res) => {
   try {
@@ -185,11 +276,21 @@ exports.paggoWebhook = async (req, res) => {
     }
 
     if (event === 'LINK_PAYED_SUCCESS') {
+      // Use real customer info from Paggo webhook if order still has placeholder
+      const customerName  = (order.customer_name  === 'Pending' && data.customerName) ? data.customerName : order.customer_name;
+      const customerEmail = (order.customer_email === 'pending@pending.com' && data.email) ? data.email : order.customer_email;
+      const customerPhone = order.customer_phone || data.phone || null;
+
+      // Patch the order with real info if it was a placeholder
+      if (order.customer_name === 'Pending' || order.customer_email === 'pending@pending.com') {
+        await Order.updateCustomerInfo(order.id, { customer_name: customerName, customer_email: customerEmail, customer_phone: customerPhone });
+      }
+
       // Create registration now that payment is confirmed
       const registration = await Registration.create({
-        full_name: order.customer_name,
-        email: order.customer_email,
-        phone: order.customer_phone,
+        full_name: customerName,
+        email: customerEmail,
+        phone: customerPhone,
         company: order.customer_company,
         course_selected: order.course_id,
         course_date_id: order.course_date_id || null,

@@ -118,6 +118,18 @@ module.exports = {
     return result.rows[0];
   },
 
+  async updateCustomerInfo(id, info) {
+    await pool.query(
+      `UPDATE orders SET
+        customer_name  = COALESCE($1, customer_name),
+        customer_email = COALESCE($2, customer_email),
+        customer_phone = COALESCE($3, customer_phone),
+        updated_at = NOW()
+       WHERE id = $4`,
+      [info.customer_name || null, info.customer_email || null, info.customer_phone || null, id]
+    );
+  },
+
   async updateAdminNotes(id, notes) {
     const result = await pool.query(
       'UPDATE orders SET admin_notes = $1, updated_at = NOW() WHERE id = $2 RETURNING *',
