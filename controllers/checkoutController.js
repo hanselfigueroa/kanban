@@ -11,7 +11,8 @@ exports.showCheckout = async (req, res) => {
     const enabled = await SiteSettings.isCheckoutEnabled();
     if (!enabled) {
       return res.render('checkout/disabled', {
-        title: 'Checkout Unavailable - Kanban.UNO'
+        title: 'Checkout Unavailable - Kanban.UNO',
+        currentPage: ''
       });
     }
 
@@ -39,6 +40,7 @@ exports.showCheckout = async (req, res) => {
 
     res.render('checkout/index', {
       title: 'Checkout - Kanban.UNO',
+      currentPage: '',
       registration,
       course,
       courseDate,
@@ -198,6 +200,7 @@ exports.showSuccess = async (req, res) => {
 
     res.render('checkout/success', {
       title: 'Order Confirmed - Kanban.UNO',
+      currentPage: '',
       order,
       course,
       successMessage: settings.checkout_success_message
