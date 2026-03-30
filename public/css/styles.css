@@ -1903,7 +1903,7 @@ img {
 .checkout-page {
   min-height: 100vh;
   background: var(--primary-black);
-  padding: 60px 24px 80px;
+  padding: 100px 24px 80px;
 }
 .checkout-container {
   max-width: 960px;

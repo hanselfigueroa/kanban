@@ -85,10 +85,10 @@ module.exports = {
         payment_method = COALESCE($2, payment_method),
         payment_reference = COALESCE($3, payment_reference),
         paggo_transaction_id = COALESCE($4, paggo_transaction_id),
-        paggo_response = COALESCE($5, paggo_response),
-        paid_at = CASE WHEN $1 = 'paid' THEN NOW() ELSE paid_at END,
+        paggo_response = COALESCE($5::jsonb, paggo_response),
+        paid_at = CASE WHEN $6 = 'paid' THEN NOW() ELSE paid_at END,
         updated_at = NOW()
-       WHERE id = $6
+       WHERE id = $7
        RETURNING *`,
       [
         status,
@@ -96,6 +96,7 @@ module.exports = {
         paymentData.payment_reference || null,
         paymentData.paggo_transaction_id || null,
         paymentData.paggo_response ? JSON.stringify(paymentData.paggo_response) : null,
+        status,
         id
       ]
     );

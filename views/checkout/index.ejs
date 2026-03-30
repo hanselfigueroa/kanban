@@ -137,7 +137,7 @@
           </div>
         </div>
 
-        <a href="/courses/<%= course ? course.course_id : '' %>" class="checkout-back">
+        <a href="/courses/<%= course ? (course.id || course.course_id) : '' %>" class="checkout-back">
           <i class="fas fa-arrow-left"></i> Back to course
         </a>
       </div>
@@ -150,7 +150,7 @@
 (function () {
   var form    = document.getElementById('checkoutForm');
   var payBtn  = document.getElementById('btnPay');
-  var courseId = '<%= course ? course.course_id : "" %>';
+  var courseId = '<%= course ? (course.id || course.course_id) : "" %>';
 
   if (!form || !payBtn) return;
 
