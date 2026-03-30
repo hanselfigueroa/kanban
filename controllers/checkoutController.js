@@ -34,6 +34,7 @@ exports.showCheckout = async (req, res) => {
       title: 'Checkout - Kanban.UNO',
       currentPage: '',
       course,
+      courseSlug: req.params.courseId,
       courseDate,
       settings,
       pricing: { subtotal: price, taxRate, taxAmount, total, currency: settings.checkout_currency || 'GTQ' }
@@ -50,9 +51,7 @@ exports.processPayment = async (req, res) => {
     const enabled = await SiteSettings.isCheckoutEnabled();
     if (!enabled) return res.status(400).json({ success: false, error: 'Checkout is disabled' });
 
-    console.log('[processPayment] courseId param:', req.params.courseId);
     const course = await CourseDb.getById(req.params.courseId);
-    console.log('[processPayment] course found:', course ? course.course_id : 'NULL');
     if (!course) return res.status(404).json({ success: false, error: `Course not found (id: ${req.params.courseId})` });
 
     // Customer info submitted from checkout form
