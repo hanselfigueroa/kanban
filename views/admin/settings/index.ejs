@@ -38,6 +38,25 @@
           </div>
         </div>
 
+        <!-- Registration Form Toggle -->
+        <div class="content-card">
+          <div class="content-card-header">
+            <h3><i class="fas fa-clipboard-list"></i> Registration Form</h3>
+          </div>
+          <div class="content-card-body">
+            <div class="form-group">
+              <label class="toggle-label">
+                <input type="checkbox" name="show_registration_form" class="form-checkbox"
+                  <%= (settings.show_registration_form === 'true' || settings.show_registration_form === undefined || settings.show_registration_form === null) ? 'checked' : '' %>>
+                <span class="toggle-text">
+                  <strong>Show "Register Your Interest" Form</strong>
+                  <small>When enabled, the registration sidebar form is shown on course detail pages</small>
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+
         <!-- Pricing Settings -->
         <div class="content-card">
           <div class="content-card-header">

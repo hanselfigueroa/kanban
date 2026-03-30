@@ -1,8 +1,9 @@
-const express    = require('express');
-const router     = express.Router();
-const CourseDb   = require('../models/courseDb');
-const CourseDate = require('../models/courseDate');
-const hardcoded  = require('../config/courses');
+const express      = require('express');
+const router       = express.Router();
+const CourseDb     = require('../models/courseDb');
+const CourseDate   = require('../models/courseDate');
+const hardcoded    = require('../config/courses');
+const SiteSettings = require('../models/siteSettings');
 
 // Helper: get courses from DB, fall back to hardcoded config
 async function getCourses() {
@@ -60,19 +61,24 @@ router.get('/:courseId', async (req, res) => {
   const course     = courses[req.params.courseId];
   if (!course) return res.status(404).render('404', { title: '404', currentPage: '' });
 
-  // Fetch curriculum & upcoming dates in parallel
-  const [curriculum, upcomingDates] = await Promise.all([
+  // Fetch curriculum, upcoming dates, and site settings in parallel
+  const [curriculum, upcomingDates, siteSettings] = await Promise.all([
     getCurriculum(req.params.courseId),
-    CourseDate.getForCourse(req.params.courseId, 3).catch(() => [])
+    CourseDate.getForCourse(req.params.courseId, 3).catch(() => []),
+    SiteSettings.getCheckoutSettings().catch(() => ({}))
   ]);
   course.curriculum = curriculum;
+
+  // Default to showing the form if the setting hasn't been set yet
+  const showRegistrationForm = siteSettings.show_registration_form !== 'false';
 
   res.render('course-detail', {
     title: `${course.name} (${course.acronym}) - Kanban.UNO`,
     currentPage: 'courses',
     course,
     courses,
-    upcomingDates
+    upcomingDates,
+    showRegistrationForm
   });
 });
 

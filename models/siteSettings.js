@@ -67,7 +67,8 @@ module.exports = {
       'paggo_api_key',
       'paggo_merchant_id',
       'checkout_success_message',
-      'checkout_terms'
+      'checkout_terms',
+      'show_registration_form'
     ]);
   }
 };

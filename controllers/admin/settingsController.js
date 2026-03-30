@@ -30,7 +30,8 @@ exports.updateSettings = async (req, res) => {
       paggo_api_key: xss((body.paggo_api_key || '').trim()),
       paggo_merchant_id: xss((body.paggo_merchant_id || '').trim()),
       checkout_success_message: xss(body.checkout_success_message || ''),
-      checkout_terms: xss(body.checkout_terms || '')
+      checkout_terms: xss(body.checkout_terms || ''),
+      show_registration_form: body.show_registration_form === 'on' ? 'true' : 'false'
     };
     await SiteSettings.setMultiple(settings);
     res.redirect('/admin/settings?success=saved');
