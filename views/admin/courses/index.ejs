@@ -18,10 +18,10 @@
         </a>
       </div>
 
-      <% if (req.query.success === 'deleted') { %>
+      <% if (success === 'deleted') { %>
         <div class="alert alert-success"><i class="fas fa-check-circle"></i> Course deleted successfully.</div>
       <% } %>
-      <% if (req.query.error === 'delete_failed') { %>
+      <% if (error === 'delete_failed') { %>
         <div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> Failed to delete course.</div>
       <% } %>
 

@@ -9,7 +9,9 @@ exports.listCourses = async (req, res) => {
       currentPage: 'courses',
       pageTitle: 'Courses',
       adminUsername: req.session.adminUsername,
-      courses
+      courses,
+      success: req.query.success,
+      error: req.query.error
     });
   } catch (err) {
     console.error(err);
