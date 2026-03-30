@@ -87,6 +87,29 @@ exports.processPayment = async (req, res) => {
       currency: settings.checkout_currency || 'GTQ'
     });
 
+    // ── Free enrollment (no payment needed) ──────────────────────────────────
+    if (total <= 0) {
+      const registration = await Registration.create({
+        full_name,
+        email,
+        phone,
+        company,
+        course_selected: course.course_id,
+        course_date_id: course_date_id || null,
+        preferred_format: null,
+        message: null
+      });
+      await Registration.updateStatus(registration.id, 'confirmed');
+      await Order.updateRegistrationId(order.id, registration.id);
+      await Order.updatePaymentStatus(order.id, 'paid', { payment_method: 'free' });
+      const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+      return res.json({
+        success: true,
+        redirect_url: `${baseUrl}/checkout/success/${order.order_number}`,
+        order: { id: order.id, order_number: order.order_number }
+      });
+    }
+
     // ── Call Paggo API ────────────────────────────────────────────────────────
     const apiKey = settings.paggo_api_key;
     const apiUrl = (settings.paggo_api_url || 'https://api.paggoapp.com/api').replace(/\/$/, '');
