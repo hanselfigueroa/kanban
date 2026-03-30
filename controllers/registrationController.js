@@ -111,7 +111,8 @@ async function createRegistration(req, res) {
       const SiteSettings = require('../models/siteSettings');
       const checkoutEnabled = await SiteSettings.isCheckoutEnabled();
       if (checkoutEnabled) {
-        checkoutUrl = `/checkout/${registration.id}`;
+        const dateParam = sanitized.course_date_id ? `?date_id=${sanitized.course_date_id}` : '';
+        checkoutUrl = `/checkout/${sanitized.course_selected}${dateParam}`;
       }
     } catch (e) {
       // If settings table doesn't exist yet, skip checkout
