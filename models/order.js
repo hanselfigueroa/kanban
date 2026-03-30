@@ -102,6 +102,14 @@ module.exports = {
     return result.rows[0];
   },
 
+  async getByPaggoLinkId(paggoLinkId) {
+    const result = await pool.query(
+      'SELECT * FROM orders WHERE paggo_transaction_id = $1 LIMIT 1',
+      [String(paggoLinkId)]
+    );
+    return result.rows[0];
+  },
+
   async updateAdminNotes(id, notes) {
     const result = await pool.query(
       'UPDATE orders SET admin_notes = $1, updated_at = NOW() WHERE id = $2 RETURNING *',

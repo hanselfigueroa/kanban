@@ -85,45 +85,56 @@ exports.processPayment = async (req, res) => {
       currency: settings.checkout_currency || 'GTQ'
     });
 
-    // ┌─────────────────────────────────────────────────────────────────────┐
-    // │ PAGGO API INTEGRATION PLACEHOLDER                                  │
-    // │                                                                    │
-    // │ When ready to integrate with Paggo, replace this section with:     │
-    // │                                                                    │
-    // │ 1. Call Paggo API to create a payment:                             │
-    // │    POST {paggo_api_url}/payments                                   │
-    // │    Headers: Authorization: Bearer {paggo_api_key}                  │
-    // │    Body: {                                                         │
-    // │      merchant_id: settings.paggo_merchant_id,                      │
-    // │      amount: total,                                                │
-    // │      currency: settings.checkout_currency,                         │
-    // │      description: `${course.name} - ${order.order_number}`,        │
-    // │      reference: order.order_number,                                │
-    // │      callback_url: `${BASE_URL}/checkout/webhook/paggo`,           │
-    // │      return_url: `${BASE_URL}/checkout/success/${order.order_number}`│
-    // │    }                                                               │
-    // │                                                                    │
-    // │ 2. Paggo will return a payment URL or payment token                │
-    // │    Redirect the user to Paggo's payment page, OR                   │
-    // │    Return the payment link for the frontend to handle              │
-    // │                                                                    │
-    // │ 3. Paggo sends a webhook to /checkout/webhook/paggo on completion  │
-    // │    Update order status to 'paid' or 'failed'                       │
-    // └─────────────────────────────────────────────────────────────────────┘
+    // ── Call Paggo API to generate a payment link ──────────────────────────
+    const apiKey = settings.paggo_api_key;
+    const apiUrl = (settings.paggo_api_url || 'https://api.paggoapp.com/api').replace(/\/$/, '');
 
-    // For now: return the order info so the admin can manually process
-    // or connect to Paggo later
+    if (!apiKey) {
+      return res.status(500).json({ success: false, error: 'Payment gateway not configured' });
+    }
+
+    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+
+    const paggoRes = await fetch(`${apiUrl}/center/transactions/create-link`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-KEY': apiKey
+      },
+      body: JSON.stringify({
+        concept: `${course ? course.name : registration.course_selected} - ${order.order_number}`,
+        amount: total,
+        customerName: registration.full_name,
+        email: registration.email,
+        metadata: {
+          redirectUrl: `${baseUrl}/checkout/success/${order.order_number}`,
+          custom: {
+            orderId: order.order_number,
+            registrationId: String(registrationId)
+          }
+        }
+      })
+    });
+
+    const paggoData = await paggoRes.json();
+
+    if (!paggoRes.ok || !paggoData.result?.link) {
+      console.error('Paggo API error:', paggoData);
+      await Order.updatePaymentStatus(order.id, 'failed', { paggo_response: paggoData });
+      return res.status(502).json({ success: false, error: 'Payment gateway error. Please try again.' });
+    }
+
+    // Store Paggo link ID so the webhook can match it back to this order
+    await Order.updatePaymentStatus(order.id, 'pending', {
+      paggo_transaction_id: String(paggoData.result.id),
+      payment_method: 'paggo',
+      paggo_response: paggoData
+    });
+
     res.json({
       success: true,
-      order: {
-        id: order.id,
-        order_number: order.order_number,
-        total: order.total,
-        currency: order.currency
-      },
-      // When Paggo is integrated, this will be the payment URL:
-      payment_url: null,
-      message: 'Order created. Payment integration pending.'
+      payment_url: paggoData.result.link,
+      order: { id: order.id, order_number: order.order_number }
     });
   } catch (err) {
     console.error('Payment processing error:', err);
@@ -134,41 +145,44 @@ exports.processPayment = async (req, res) => {
 // ── Paggo webhook handler ───────────────────────────────────────────────────
 exports.paggoWebhook = async (req, res) => {
   try {
-    // ┌─────────────────────────────────────────────────────────────────────┐
-    // │ PAGGO WEBHOOK PLACEHOLDER                                          │
-    // │                                                                    │
-    // │ Paggo will POST to this endpoint when payment status changes.      │
-    // │                                                                    │
-    // │ 1. Verify webhook signature using paggo_api_key                    │
-    // │ 2. Extract transaction_id and status from Paggo payload            │
-    // │ 3. Find order by reference (order_number)                          │
-    // │ 4. Update order payment status accordingly                         │
-    // │ 5. Update registration status if payment succeeded                 │
-    // └─────────────────────────────────────────────────────────────────────┘
+    const { event, data } = req.body;
 
-    const { reference, status, transaction_id } = req.body;
-
-    if (!reference) return res.status(400).json({ error: 'Missing reference' });
-
-    const order = await Order.getByOrderNumber(reference);
-    if (!order) return res.status(404).json({ error: 'Order not found' });
-
-    const paymentStatus = status === 'approved' ? 'paid' : (status === 'declined' ? 'failed' : 'pending');
-
-    await Order.updatePaymentStatus(order.id, paymentStatus, {
-      paggo_transaction_id: transaction_id,
-      payment_method: 'paggo',
-      paggo_response: req.body
-    });
-
-    // Update registration status if paid
-    if (paymentStatus === 'paid') {
-      await Registration.updateStatus(order.registration_id, 'confirmed');
+    if (!event || !data) {
+      return res.status(400).json({ error: 'Invalid webhook payload' });
     }
 
-    res.json({ success: true });
+    console.log(`Paggo webhook received: ${event}`, data.linkId);
+
+    // Find our order using the Paggo link ID stored at payment creation
+    const order = await Order.getByPaggoLinkId(String(data.linkId));
+    if (!order) {
+      console.warn('Paggo webhook: no order found for linkId', data.linkId);
+      // Return 200 so Paggo doesn't keep retrying for unknown links
+      return res.json({ received: true });
+    }
+
+    if (event === 'LINK_PAYED_SUCCESS') {
+      await Order.updatePaymentStatus(order.id, 'paid', {
+        paggo_transaction_id: String(data.linkId),
+        payment_method: `paggo${data.paymentMethod?.brand ? '_' + data.paymentMethod.brand.toLowerCase() : ''}`,
+        paggo_response: req.body
+      });
+      await Registration.updateStatus(order.registration_id, 'confirmed');
+
+    } else if (event === 'LINK_WRONG_PAYMENT') {
+      await Order.updatePaymentStatus(order.id, 'failed', {
+        paggo_response: req.body
+      });
+
+    } else if (event === 'LINK_REVERSED_SUCCESS') {
+      await Order.updatePaymentStatus(order.id, 'refunded', {
+        paggo_response: req.body
+      });
+    }
+
+    res.json({ received: true });
   } catch (err) {
-    console.error('Webhook error:', err);
+    console.error('Paggo webhook error:', err);
     res.status(500).json({ error: 'Webhook processing failed' });
   }
 };
