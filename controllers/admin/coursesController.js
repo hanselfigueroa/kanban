@@ -91,8 +91,8 @@ exports.updateCourse = async (req, res) => {
 
 exports.deleteCourse = async (req, res) => {
   try {
-    await CourseDb.toggleActive(req.params.id, false);
-    res.redirect('/admin/courses?success=deactivated');
+    await CourseDb.delete(req.params.id);
+    res.redirect('/admin/courses?success=deleted');
   } catch (err) {
     console.error(err);
     res.redirect('/admin/courses?error=delete_failed');

@@ -18,6 +18,13 @@
         </a>
       </div>
 
+      <% if (req.query.success === 'deleted') { %>
+        <div class="alert alert-success"><i class="fas fa-check-circle"></i> Course deleted successfully.</div>
+      <% } %>
+      <% if (req.query.error === 'delete_failed') { %>
+        <div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> Failed to delete course.</div>
+      <% } %>
+
       <% if (courses && courses.length > 0) { %>
         <div class="table-card">
           <table class="admin-table">
@@ -27,8 +34,8 @@
                 <th>Name</th>
                 <th>Level</th>
                 <th>Duration</th>
+                <th>Price</th>
                 <th>Status</th>
-                <th>Order</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -41,6 +48,7 @@
                   <td class="course-name"><%= course.name %></td>
                   <td><%= course.level %></td>
                   <td><%= course.duration %></td>
+                  <td><%= course.price ? 'Q' + parseFloat(course.price).toFixed(2) : '—' %></td>
                   <td>
                     <% if (course.is_active) { %>
                       <span class="badge badge-success">Active</span>
@@ -48,7 +56,6 @@
                       <span class="badge badge-inactive">Inactive</span>
                     <% } %>
                   </td>
-                  <td><%= course.display_order %></td>
                   <td>
                     <div class="action-buttons">
                       <a href="/admin/courses/<%= course.course_id %>/edit" class="btn btn-sm btn-secondary" title="Edit">
@@ -71,6 +78,16 @@
                       >
                         <i class="fas <%= course.is_active ? 'fa-toggle-off' : 'fa-toggle-on' %>"></i>
                         <%= course.is_active ? 'Deactivate' : 'Activate' %>
+                      </button>
+                      <button
+                        class="btn btn-sm btn-danger"
+                        data-delete-course
+                        data-course-id="<%= course.course_id %>"
+                        data-course-name="<%= course.name %>"
+                        title="Delete"
+                      >
+                        <i class="fas fa-trash-alt"></i>
+                        Delete
                       </button>
                     </div>
                   </td>
@@ -133,4 +150,21 @@
     });
   });
 })();
+
+  // ── Delete Course ──────────────────────────────────────────────────────────
+  document.querySelectorAll('[data-delete-course]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var id   = btn.getAttribute('data-course-id');
+      var name = btn.getAttribute('data-course-name');
+      if (!confirm('Delete "' + name + '"? This cannot be undone.')) return;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting…';
+
+      var form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/admin/courses/' + id + '/delete';
+      document.body.appendChild(form);
+      form.submit();
+    });
+  });
 </script>
