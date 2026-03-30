@@ -13,6 +13,13 @@
 }
 </script>
 
+<!-- Payment error flash -->
+<% if (paymentError) { %>
+<div style="background:#c0392b;color:#fff;padding:14px 24px;text-align:center;font-size:0.9rem;">
+  <i class="fas fa-exclamation-circle"></i> <%= paymentError %>
+</div>
+<% } %>
+
 <!-- Breadcrumb -->
 <section class="breadcrumb-section">
   <div class="container">

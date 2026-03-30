@@ -72,13 +72,19 @@ router.get('/:courseId', async (req, res) => {
   // Default to showing the form if the setting hasn't been set yet
   const showRegistrationForm = siteSettings.show_registration_form !== 'false';
 
+  const errorMap = {
+    payment: 'There was a problem starting the payment. Please try again or contact us.',
+    config:  'Payment is not configured yet. Please contact us to complete your registration.'
+  };
+
   res.render('course-detail', {
     title: `${course.name} (${course.acronym}) - Kanban.UNO`,
     currentPage: 'courses',
     course,
     courses,
     upcomingDates,
-    showRegistrationForm
+    showRegistrationForm,
+    paymentError: errorMap[req.query.error] || null
   });
 });
 

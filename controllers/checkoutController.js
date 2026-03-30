@@ -80,6 +80,11 @@ exports.startCheckout = async (req, res) => {
     if (!paggoRes.ok || !paggoData.result?.link) {
       console.error('[Paggo] start error:', paggoData);
       await Order.updatePaymentStatus(order.id, 'failed', { paggo_response: paggoData });
+      // Paggo minimum-amount error — tell admin to fix the course price
+      if (paggoData.message && paggoData.message.includes('Mínimo')) {
+        console.error(`[Paggo] Course "${course.course_id}" total ${total} is below Paggo minimum. Update the course price.`);
+        return res.redirect(`/courses/${req.params.courseId}?error=payment`);
+      }
       return res.redirect(`/courses/${req.params.courseId}?error=payment`);
     }
 
