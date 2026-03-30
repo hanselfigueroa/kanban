@@ -8,8 +8,11 @@ const SiteSettings = require('../models/siteSettings');
 // Helper: get courses from DB, fall back to hardcoded config
 async function getCourses() {
   try {
-    const dbCourses = await CourseDb.getAll();
-    if (dbCourses.length > 0) {
+    // Use includeInactive to check if DB has any courses at all
+    const allDbCourses = await CourseDb.getAll({ includeInactive: true });
+    if (allDbCourses.length > 0) {
+      // DB is authoritative — only show active ones (may be empty if all deactivated)
+      const dbCourses = allDbCourses.filter(c => c.is_active);
       // Normalise DB rows to match the shape public views expect
       const map = {};
       for (const c of dbCourses) {
@@ -31,7 +34,7 @@ async function getCourses() {
       }
       return map;
     }
-  } catch (e) { /* DB not ready yet */ }
+  } catch (e) { /* DB not ready yet — fall back to hardcoded */ }
   return hardcoded;
 }
 
