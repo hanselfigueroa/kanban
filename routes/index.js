@@ -7,10 +7,10 @@ const Testimonial = require('../models/testimonial');
 
 async function getCourses() {
   try {
-    const dbCourses = await CourseDb.getAll();
-    if (dbCourses.length > 0) {
+    const allDbCourses = await CourseDb.getAll({ includeInactive: true });
+    if (allDbCourses.length > 0) {
       const map = {};
-      for (const c of dbCourses) {
+      for (const c of allDbCourses.filter(c => c.is_active)) {
         map[c.course_id] = {
           id: c.course_id, name: c.name, acronym: c.acronym,
           level: c.level, duration: c.duration,
