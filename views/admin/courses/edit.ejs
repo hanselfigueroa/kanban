@@ -17,7 +17,7 @@
       </div>
 
       <form
-        action="<%= isNew ? '/admin/courses' : '/admin/courses/' + course.id %>"
+        action="<%= isNew ? '/admin/courses' : '/admin/courses/' + course.course_id %>"
         method="POST"
         class="edit-form"
       >
@@ -281,7 +281,7 @@
                 type="button"
                 class="btn btn-danger"
                 data-confirm="Are you sure you want to deactivate this course? It will no longer appear on the site."
-                data-action="/admin/courses/<%= course.id %>"
+                data-action="/admin/courses/<%= course.course_id %>"
                 data-method="DELETE"
               >
                 <i class="fas fa-ban"></i>
