@@ -24,6 +24,7 @@ async function getCourses() {
           audience, outcomes,
           color: hardcoded[c.course_id]?.color || '#6b46c1',
           icon:  hardcoded[c.course_id]?.icon  || 'fa-book',
+          rawPrice: c.price ? parseFloat(c.price) : null,
           price: c.price ? `$${c.price}` : 'Contact for pricing',
           curriculum: [] // loaded separately per-detail
         };
@@ -72,6 +73,21 @@ router.get('/:courseId', async (req, res) => {
   // Default to showing the form if the setting hasn't been set yet
   const showRegistrationForm = siteSettings.show_registration_form !== 'false';
 
+  // Calculate the price shown to the user — must match what Paggo charges
+  const rawPrice  = course.rawPrice || 0;
+  const taxRate   = parseFloat(siteSettings.checkout_tax_rate) || 0;
+  const currency  = siteSettings.checkout_currency || 'GTQ';
+  const symbol    = currency === 'GTQ' ? 'Q' : '$';
+  let priceDisplay;
+  if (!course.rawPrice) {
+    priceDisplay = 'Contact for pricing';
+  } else if (taxRate > 0) {
+    const total = Math.round(rawPrice * (1 + taxRate) * 100) / 100;
+    priceDisplay = `${symbol}${total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (IVA included)`;
+  } else {
+    priceDisplay = `${symbol}${rawPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+
   const errorMap = {
     payment: 'There was a problem starting the payment. Please try again or contact us.',
     config:  'Payment is not configured yet. Please contact us to complete your registration.'
@@ -84,6 +100,7 @@ router.get('/:courseId', async (req, res) => {
     courses,
     upcomingDates,
     showRegistrationForm,
+    priceDisplay,
     paymentError: errorMap[req.query.error] || null
   });
 });
