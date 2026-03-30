@@ -150,7 +150,7 @@
 (function () {
   var form    = document.getElementById('checkoutForm');
   var payBtn  = document.getElementById('btnPay');
-  var courseId = '<%= courseSlug %>';
+  var courseId = window.location.pathname.split('/')[2];
 
   if (!form || !payBtn) return;
 

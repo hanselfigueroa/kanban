@@ -136,12 +136,20 @@ exports.processPayment = async (req, res) => {
       })
     });
 
-    const paggoData = await paggoRes.json();
+    const rawText = await paggoRes.text();
+    console.log('[Paggo] URL:', `${apiUrl}/center/transactions/create-link`);
+    console.log('[Paggo] status:', paggoRes.status, '| body:', rawText.substring(0, 300));
+
+    let paggoData;
+    try { paggoData = JSON.parse(rawText); } catch (e) {
+      await Order.updatePaymentStatus(order.id, 'failed', { paggo_response: { raw: rawText.substring(0, 500) } });
+      return res.status(502).json({ success: false, error: 'Payment gateway returned an unexpected response.' });
+    }
 
     if (!paggoRes.ok || !paggoData.result?.link) {
-      console.error('Paggo API error:', paggoData);
+      console.error('[Paggo] API error:', paggoData);
       await Order.updatePaymentStatus(order.id, 'failed', { paggo_response: paggoData });
-      return res.status(502).json({ success: false, error: 'Payment gateway error. Please try again.' });
+      return res.status(502).json({ success: false, error: paggoData.message || 'Payment gateway error. Please try again.' });
     }
 
     await Order.updatePaymentStatus(order.id, 'pending', {
