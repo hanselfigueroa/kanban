@@ -16,7 +16,7 @@ async function getCourses() {
         try { audience = JSON.parse(c.who_should_attend || '[]'); } catch { audience = (c.who_should_attend || '').split('\n').filter(Boolean); }
         try { outcomes = JSON.parse(c.learning_objectives || '[]'); } catch { outcomes = (c.learning_objectives || '').split('\n').filter(Boolean); }
         map[c.course_id] = {
-          id: c.course_id, name: c.name, acronym: c.acronym,
+          id: c.course_id, course_id: c.course_id, name: c.name, acronym: c.acronym,
           level: c.level, duration: c.duration,
           shortDescription: c.short_description || c.tagline || '',
           description: c.full_description || c.short_description || '',
