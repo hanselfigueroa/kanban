@@ -2092,6 +2092,13 @@ img {
 @keyframes spin { to { transform: rotate(360deg); } }
 .checkout-processing p { font-size: .9rem; color: var(--text-gray); }
 
+.checkout-field { margin-bottom: 1rem; }
+.checkout-field label { display: block; font-size: 0.72rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-gray); margin-bottom: .4rem; }
+.checkout-field label .required { color: #f87171; }
+.checkout-input { width: 100%; padding: .6rem .875rem; background: #0f0f0f; border: 1px solid rgba(255,255,255,.1); border-radius: 6px; color: var(--text-primary); font-size: .9rem; transition: border-color .2s; box-sizing: border-box; }
+.checkout-input:focus { outline: none; border-color: var(--accent-purple); box-shadow: 0 0 0 3px rgba(109,40,217,.2); }
+.checkout-input::placeholder { color: var(--text-muted); }
+
 .checkout-terms {
   margin-top: 20px;
   padding-top: 16px;

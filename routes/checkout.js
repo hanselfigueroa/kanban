@@ -6,8 +6,8 @@ const checkoutCtrl = require('../controllers/checkoutController');
 router.get('/success/:orderNumber', checkoutCtrl.showSuccess);
 router.post('/webhook/paggo', checkoutCtrl.paggoWebhook);
 
-// Public checkout pages
-router.get('/:registrationId', checkoutCtrl.showCheckout);
-router.post('/:registrationId/pay', checkoutCtrl.processPayment);
+// Public checkout pages — :courseId is the course_id string (e.g. 'tkp')
+router.get('/:courseId', checkoutCtrl.showCheckout);
+router.post('/:courseId/pay', checkoutCtrl.processPayment);
 
 module.exports = router;

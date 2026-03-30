@@ -102,6 +102,13 @@ module.exports = {
     return result.rows[0];
   },
 
+  async updateRegistrationId(id, registrationId) {
+    await pool.query(
+      'UPDATE orders SET registration_id = $1, updated_at = NOW() WHERE id = $2',
+      [registrationId, id]
+    );
+  },
+
   async getByPaggoLinkId(paggoLinkId) {
     const result = await pool.query(
       'SELECT * FROM orders WHERE paggo_transaction_id = $1 LIMIT 1',

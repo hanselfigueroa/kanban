@@ -16,24 +16,16 @@ exports.showCheckout = async (req, res) => {
       });
     }
 
-    const registrationId = req.params.registrationId;
-    const registration = await Registration.getById(registrationId);
-    if (!registration) return res.status(404).send('Registration not found');
+    const course = await CourseDb.getById(req.params.courseId);
+    if (!course) return res.status(404).send('Course not found');
 
-    // Check if order already exists for this registration
-    const existingOrder = await Order.getByRegistrationId(registrationId);
-    if (existingOrder && existingOrder.payment_status === 'paid') {
-      return res.redirect(`/checkout/success/${existingOrder.order_number}`);
-    }
-
-    const course = await CourseDb.getById(registration.course_selected);
     let courseDate = null;
-    if (registration.course_date_id) {
-      courseDate = await CourseDate.getById(registration.course_date_id);
+    if (req.query.date_id) {
+      courseDate = await CourseDate.getById(req.query.date_id);
     }
 
     const settings = await SiteSettings.getCheckoutSettings();
-    const price = course ? parseFloat(course.price) || 0 : 0;
+    const price = parseFloat(course.price) || 0;
     const taxRate = parseFloat(settings.checkout_tax_rate) || 0;
     const taxAmount = Math.round(price * taxRate * 100) / 100;
     const total = Math.round((price + taxAmount) * 100) / 100;
@@ -41,7 +33,6 @@ exports.showCheckout = async (req, res) => {
     res.render('checkout/index', {
       title: 'Checkout - Kanban.UNO',
       currentPage: '',
-      registration,
       course,
       courseDate,
       settings,
@@ -59,27 +50,36 @@ exports.processPayment = async (req, res) => {
     const enabled = await SiteSettings.isCheckoutEnabled();
     if (!enabled) return res.status(400).json({ success: false, error: 'Checkout is disabled' });
 
-    const registrationId = req.params.registrationId;
-    const registration = await Registration.getById(registrationId);
-    if (!registration) return res.status(404).json({ success: false, error: 'Registration not found' });
+    const course = await CourseDb.getById(req.params.courseId);
+    if (!course) return res.status(404).json({ success: false, error: 'Course not found' });
 
-    const course = await CourseDb.getById(registration.course_selected);
+    // Customer info submitted from checkout form
+    const full_name  = xss((req.body.full_name  || '').trim());
+    const email      = xss((req.body.email      || '').trim().toLowerCase());
+    const phone      = req.body.phone    ? xss(req.body.phone.trim())    : null;
+    const company    = req.body.company  ? xss(req.body.company.trim())  : null;
+    const message    = req.body.message  ? xss(req.body.message.trim())  : null;
+    const course_date_id = req.body.course_date_id ? parseInt(req.body.course_date_id) || null : null;
+
+    if (!full_name || !email) {
+      return res.status(400).json({ success: false, error: 'Name and email are required' });
+    }
+
     const settings = await SiteSettings.getCheckoutSettings();
-
-    const price = course ? parseFloat(course.price) || 0 : 0;
-    const taxRate = parseFloat(settings.checkout_tax_rate) || 0;
+    const price    = parseFloat(course.price) || 0;
+    const taxRate  = parseFloat(settings.checkout_tax_rate) || 0;
     const taxAmount = Math.round(price * taxRate * 100) / 100;
-    const total = Math.round((price + taxAmount) * 100) / 100;
+    const total    = Math.round((price + taxAmount) * 100) / 100;
 
-    // Create order record
+    // Create order — registration created later on payment success
     const order = await Order.create({
-      registration_id: registrationId,
-      course_id: registration.course_selected,
-      course_date_id: registration.course_date_id || null,
-      customer_name: registration.full_name,
-      customer_email: registration.email,
-      customer_phone: registration.phone,
-      customer_company: registration.company,
+      registration_id: null,
+      course_id: course.course_id,
+      course_date_id,
+      customer_name: full_name,
+      customer_email: email,
+      customer_phone: phone,
+      customer_company: company,
       subtotal: price,
       tax_rate: taxRate,
       tax_amount: taxAmount,
@@ -87,7 +87,7 @@ exports.processPayment = async (req, res) => {
       currency: settings.checkout_currency || 'GTQ'
     });
 
-    // ── Call Paggo API to generate a payment link ──────────────────────────
+    // ── Call Paggo API ────────────────────────────────────────────────────────
     const apiKey = settings.paggo_api_key;
     const apiUrl = (settings.paggo_api_url || 'https://api.paggoapp.com/api').replace(/\/$/, '');
 
@@ -99,21 +99,15 @@ exports.processPayment = async (req, res) => {
 
     const paggoRes = await fetch(`${apiUrl}/center/transactions/create-link`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-KEY': apiKey
-      },
+      headers: { 'Content-Type': 'application/json', 'X-API-KEY': apiKey },
       body: JSON.stringify({
-        concept: `${course ? course.name : registration.course_selected} - ${order.order_number}`,
+        concept: `${course.name} - ${order.order_number}`,
         amount: total,
-        customerName: registration.full_name,
-        email: registration.email,
+        customerName: full_name,
+        email,
         metadata: {
           redirectUrl: `${baseUrl}/checkout/success/${order.order_number}`,
-          custom: {
-            orderId: order.order_number,
-            registrationId: String(registrationId)
-          }
+          custom: { orderId: order.order_number }
         }
       })
     });
@@ -126,7 +120,6 @@ exports.processPayment = async (req, res) => {
       return res.status(502).json({ success: false, error: 'Payment gateway error. Please try again.' });
     }
 
-    // Store Paggo link ID so the webhook can match it back to this order
     await Order.updatePaymentStatus(order.id, 'pending', {
       paggo_transaction_id: String(paggoData.result.id),
       payment_method: 'paggo',
@@ -149,37 +142,42 @@ exports.paggoWebhook = async (req, res) => {
   try {
     const { event, data } = req.body;
 
-    if (!event || !data) {
-      return res.status(400).json({ error: 'Invalid webhook payload' });
-    }
+    if (!event || !data) return res.status(400).json({ error: 'Invalid webhook payload' });
 
     console.log(`Paggo webhook received: ${event}`, data.linkId);
 
-    // Find our order using the Paggo link ID stored at payment creation
     const order = await Order.getByPaggoLinkId(String(data.linkId));
     if (!order) {
       console.warn('Paggo webhook: no order found for linkId', data.linkId);
-      // Return 200 so Paggo doesn't keep retrying for unknown links
       return res.json({ received: true });
     }
 
     if (event === 'LINK_PAYED_SUCCESS') {
+      // Create registration now that payment is confirmed
+      const registration = await Registration.create({
+        full_name: order.customer_name,
+        email: order.customer_email,
+        phone: order.customer_phone,
+        company: order.customer_company,
+        course_selected: order.course_id,
+        course_date_id: order.course_date_id || null,
+        preferred_format: null,
+        message: null
+      });
+
+      await Registration.updateStatus(registration.id, 'confirmed');
+      await Order.updateRegistrationId(order.id, registration.id);
       await Order.updatePaymentStatus(order.id, 'paid', {
         paggo_transaction_id: String(data.linkId),
         payment_method: `paggo${data.paymentMethod?.brand ? '_' + data.paymentMethod.brand.toLowerCase() : ''}`,
         paggo_response: req.body
       });
-      await Registration.updateStatus(order.registration_id, 'confirmed');
 
     } else if (event === 'LINK_WRONG_PAYMENT') {
-      await Order.updatePaymentStatus(order.id, 'failed', {
-        paggo_response: req.body
-      });
+      await Order.updatePaymentStatus(order.id, 'failed', { paggo_response: req.body });
 
     } else if (event === 'LINK_REVERSED_SUCCESS') {
-      await Order.updatePaymentStatus(order.id, 'refunded', {
-        paggo_response: req.body
-      });
+      await Order.updatePaymentStatus(order.id, 'refunded', { paggo_response: req.body });
     }
 
     res.json({ received: true });

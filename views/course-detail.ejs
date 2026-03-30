@@ -95,9 +95,9 @@
                 </div>
                 <% } %>
               </div>
-              <button class="btn btn-primary btn-block btn-sm select-date-btn" data-date-id="<%= date.id %>" data-format="<%= date.format || '' %>">
+              <a href="/checkout/<%= course.course_id %>?date_id=<%= date.id %>" class="btn btn-primary btn-block btn-sm">
                 Select This Date
-              </button>
+              </a>
             </div>
             <% }); %>
           </div>
